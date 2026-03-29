@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submission Portal</title>
+    <style>
+        body { font-family: sans-serif; background: #eceff1; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #00796b; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        input, textarea, button { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #00796b; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .admin-section { margin-top: 50px; border-top: 2px dashed #ccc; padding-top: 20px; }
+        .hidden { display: none; }
+        .msg-card { background: #f9f9f9; padding: 10px; margin-bottom: 10px; border-left: 5px solid #00796b; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="submissionForm">
+    <h2>Product Submission Portal</h2>
+    <p id="limitText">Messages remaining today: 30</p>
+    
+    <input type="email" id="email" placeholder="Your Email Address" required>
+    <input type="tel" id="phone" placeholder="Phone Number" required>
+    <label>Upload Product Pictures (Multiple):</label>
+    <input type="file" id="pics" multiple accept="image/*">
+    <textarea id="note" rows="4" placeholder="Notes about the product..."></textarea>
+    
+    <button onclick="submitProduct()">Submit to Admin</button>
+    <p><a href="Nprojekt.html">← Back to Home</a></p>
+</div>
+
+<div class="container admin-section">
+    <h3>Admin Login</h3>
+    <div id="loginArea">
+        <input type="password" id="adminPass" placeholder="Enter Admin Password">
+        <button onclick="checkLogin()">View Submitted Messages</button>
+    </div>
+
+    <div id="adminPanel" class="hidden">
+        <h3>Submitted Messages</h3>
+        <div id="messageList">
+            </div>
+        <button onclick="logout()" style="background:#555">Logout</button>
+    </div>
+</div>
+
+<script>
+    // --- Logic for Limit and Storage ---
+    let submissions = JSON.parse(localStorage.getItem('msgs')) || [];
+    let limit = 30 - submissions.length;
+
+    document.getElementById('limitText').innerText = `Messages remaining today: ${limit}`;
+
+    function submitProduct() {
+        if (submissions.length >= 30) {
+            alert("Daily limit reached! Please try again in 24 hours.");
+            return;
+        }
+
+        const newEntry = {
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            note: document.getElementById('note').value,
+            time: new Date().toLocaleString()
+        };
+
+        submissions.push(newEntry);
+        localStorage.setItem('msgs', JSON.stringify(submissions));
+        alert("Product submitted successfully!");
+        location.reload(); 
+    }
+
+    // --- Admin Logic ---
+    function checkLogin() {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === "admin123") { // Your password
+            document.getElementById('loginArea').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            displayMessages();
+        } else {
+            alert("Incorrect Password");
+        }
+    }
+
+    function displayMessages() {
+        const list = document.getElementById('messageList');
+        list.innerHTML = "";
+        submissions.forEach(m => {
+            list.innerHTML += `<div class="msg-card">
+                <strong>From:</strong> ${m.email} <br>
+                <strong>Phone:</strong> ${m.phone} <br>
+                <strong>Note:</strong> ${m.note} <br>
+                <small>${m.time}</small>
+            </div>`;
+        });
+    }
+
+    function logout() {
+        location.reload();
+    }
+</script>
+
+</body>
+</html>

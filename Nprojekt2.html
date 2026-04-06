@@ -3,154 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brwa | Private Portal</title>
+    <title>Brwa | Cloud Portal</title>
     <style>
         :root { --primary: #00ffa3; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
         .card { background: var(--card); width: 100%; max-width: 500px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; box-sizing: border-box; }
         
-        h2 { color: var(--primary); margin: 0 0 15px 0; }
-        label { display: block; font-size: 11px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
+        h2 { color: var(--primary); margin: 0 0 15px 0; font-weight: 800; }
+        label { display: block; font-size: 11px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
         
-        input, textarea { width: 100%; padding: 12px; margin-bottom: 15px; background: #0f172a; border: 1px solid #334155; border-radius: 10px; color: white; font-size: 16px; box-sizing: border-box; outline: none; }
-        input[type="file"] { border: 1px dashed var(--primary); cursor: pointer; }
+        input, textarea, button { width: 100%; padding: 14px; margin-bottom: 15px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: white; font-size: 16px; box-sizing: border-box; outline: none; transition: 0.3s; }
         
-        button { width: 100%; padding: 15px; background: var(--primary); color: #000; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        button:active { transform: scale(0.98); }
+        button { background: var(--primary); color: #000; font-weight: 700; border: none; cursor: pointer; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
 
-        /* Admin Table Styles */
-        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
-        .admin-table th { text-align: left; color: var(--primary); padding: 10px; border-bottom: 1px solid #334155; }
-        .admin-table td { padding: 10px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
-        .thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; cursor: pointer; }
+        /* Mailbox UI */
+        .mail-list { margin-top: 20px; }
+        .mail-item { background: #0f172a; padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border-left: 4px solid var(--primary); border-bottom: 1px solid #334155; }
+        .mail-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; border: 1px solid var(--primary); cursor: pointer; }
+        .mail-info { font-size: 14px; flex: 1; }
+        .mail-info b { color: var(--primary); font-size: 15px; }
+        .mail-info p { margin: 4px 0 0 0; color: #94a3b8; font-size: 13px; line-height: 1.4; }
         
         .hidden { display: none; }
-        .success { color: var(--primary); font-weight: bold; text-align: center; margin-top: 10px; display: none; }
-        .delete-btn { background: #ef4444; color: white; padding: 5px 10px; font-size: 11px; width: auto; }
+        .loader { text-align: center; color: var(--primary); font-size: 14px; padding: 20px; font-weight: 600; }
     </style>
 </head>
 <body>
 
-<div class="card" id="formCard">
+<div class="card" id="formSection">
     <h2>Submit Product</h2>
-    <form id="productForm">
-        <label>Email</label>
-        <input type="email" id="uEmail" required>
+    <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Upload your product info and photo to the admin mailbox.</p>
+    <form id="pForm">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="example@mail.com" required>
         
-        <label>Phone</label>
-        <input type="tel" id="uPhone" required>
+        <label>Phone Number</label>
+        <input type="tel" id="phone" placeholder="0750 XXX XXXX" required>
         
-        <label>Capture/Select Photo</label>
-        <input type="file" id="uFile" accept="image/*" required>
+        <label>Select Photo (Gallery/Camera)</label>
+        <input type="file" id="photo" accept="image/*" required>
         
-        <label>Notes</label>
-        <textarea id="uNotes" rows="2"></textarea>
+        <label>Product Details</label>
+        <textarea id="notes" rows="3" placeholder="Enter notes here..."></textarea>
         
-        <button type="submit">Submit to Mailbox</button>
+        <button type="submit" id="sBtn">Send to Mailbox</button>
     </form>
-    <div id="doneMsg" class="success">✓ Sent to Admin Inbox!</div>
 </div>
 
-<div class="card" style="max-width: 800px;">
-    <h3 style="margin:0 0 15px 0; color: #94a3b8;">Admin Mailbox</h3>
+<div class="card">
+    <h3 style="margin:0 0 15px 0; color: #94a3b8; font-size: 16px;">Admin Mailbox</h3>
     
     <div id="loginArea">
-        <input type="password" id="adminPass" placeholder="Enter Password">
-        <button onclick="checkLogin()" style="background: #334155; color: white;">Open Mailbox</button>
+        <input type="password" id="adminPass" placeholder="Enter Admin Password">
+        <button onclick="login()" style="background: #334155; color: white;">Open Inbox</button>
     </div>
 
     <div id="mailboxArea" class="hidden">
-        <button onclick="clearAll()" class="delete-btn" style="margin-bottom: 10px;">Clear All Messages</button>
-        <div style="overflow-x: auto;">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Photo</th>
-                        <th>Contact</th>
-                        <th>Notes</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="mailTableBody">
-                    </tbody>
-            </table>
-        </div>
+        <button onclick="fetchMail()" style="background: #1e293b; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px;">Refresh Messages ↻</button>
+        <div id="loading" class="loader hidden">Syncing with Cloud...</div>
+        <div id="mailList"></div>
     </div>
 </div>
 
-<script>
-    const form = document.getElementById('productForm');
+<div style="font-size: 12px; color: #475569; margin-top: 20px;">Brwa &bull; CIS IT 2026</div>
 
-    // 1. SAVE DATA LOGIC
+<script>
+    // 1. YOUR UPDATED SCRIPT URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwLBh21ge-JTh1pqd_QRTvNtO9YvvkxcQAleHw6ttgvq_FrIv9KW5DVXwW4KG4tFM2ZgQ/exec';
+
+    const form = document.getElementById('pForm');
+    const btn = document.getElementById('sBtn');
+
+    // FORM SUBMISSION (SEND DATA)
     form.onsubmit = function(e) {
         e.preventDefault();
-        
-        const file = document.getElementById('uFile').files[0];
+        btn.innerText = "Syncing with Cloud...";
+        btn.disabled = true;
+
+        const file = document.getElementById('photo').files[0];
         const reader = new FileReader();
 
         reader.onload = function() {
-            const newMessage = {
-                id: Date.now(),
-                email: document.getElementById('uEmail').value,
-                phone: document.getElementById('uPhone').value,
-                notes: document.getElementById('uNotes').value,
-                photo: reader.result // The actual image data
+            const payload = {
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                notes: document.getElementById('notes').value,
+                photo: reader.result
             };
 
-            // Get existing messages or start new array
-            let inbox = JSON.parse(localStorage.getItem('brwa_mailbox')) || [];
-            inbox.push(newMessage);
-            localStorage.setItem('brwa_mailbox', JSON.stringify(inbox));
-
-            document.getElementById('doneMsg').style.display = "block";
-            form.reset();
-            loadMail(); // Refresh table
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            }).then(() => {
+                alert("✓ Success! Information delivered.");
+                btn.innerText = "Send to Mailbox";
+                btn.disabled = false;
+                form.reset();
+            }).catch(err => {
+                alert("Error sending data.");
+                btn.disabled = false;
+            });
         };
         reader.readAsDataURL(file);
     };
 
-    // 2. ADMIN LOGIN LOGIC
-    function checkLogin() {
-        if (document.getElementById('adminPass').value === "admin123") {
+    // ADMIN LOGIN
+    function login() {
+        if(document.getElementById('adminPass').value === "admin123") {
             document.getElementById('loginArea').classList.add('hidden');
             document.getElementById('mailboxArea').classList.remove('hidden');
-            loadMail();
+            fetchMail();
         } else {
             alert("Wrong Password");
         }
     }
 
-    // 3. LOAD MAIL LOGIC
-    function loadMail() {
-        const inbox = JSON.parse(localStorage.getItem('brwa_mailbox')) || [];
-        const tbody = document.getElementById('mailTableBody');
-        tbody.innerHTML = '';
+    // FETCH MAIL (RECEIVE DATA)
+    function fetchMail() {
+        const list = document.getElementById('mailList');
+        const loader = document.getElementById('loading');
+        list.innerHTML = '';
+        loader.classList.remove('hidden');
 
-        inbox.forEach(msg => {
-            tbody.innerHTML += `
-                <tr>
-                    <td><img src="${msg.photo}" class="thumb" onclick="window.open(this.src)"></td>
-                    <td><b>${msg.email}</b><br>${msg.phone}</td>
-                    <td>${msg.notes}</td>
-                    <td><button onclick="deleteMsg(${msg.id})" class="delete-btn">X</button></td>
-                </tr>
-            `;
-        });
-    }
-
-    function deleteMsg(id) {
-        let inbox = JSON.parse(localStorage.getItem('brwa_mailbox'));
-        inbox = inbox.filter(m => m.id !== id);
-        localStorage.setItem('brwa_mailbox', JSON.stringify(inbox));
-        loadMail();
-    }
-
-    function clearAll() {
-        if(confirm("Delete all messages?")) {
-            localStorage.removeItem('brwa_mailbox');
-            loadMail();
-        }
+        fetch(scriptURL)
+            .then(res => res.json())
+            .then(data => {
+                loader.classList.add('hidden');
+                // Newest messages first
+                data.reverse().forEach(item => {
+                    list.innerHTML += `
+                        <div class="mail-item">
+                            <img src="${item.photo}" class="mail-img" onclick="window.open(this.src)">
+                            <div class="mail-info">
+                                <b>${item.email}</b><br>
+                                <span style="font-size:12px;">${item.phone}</span>
+                                <p>${item.notes || 'No extra notes provided.'}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
     }
 </script>
 

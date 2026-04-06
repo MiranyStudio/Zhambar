@@ -45,6 +45,15 @@
         button:active { background: #004d40; transform: scale(0.98); }
         button:disabled { background: #999; cursor: not-allowed; }
 
+        .admin-section { 
+            margin-top: 30px; 
+            border-top: 2px dashed #ccc; 
+            padding-top: 20px; 
+            text-align: center;
+        }
+
+        .hidden { display: none; }
+        
         .success-msg { 
             color: #00796b; 
             font-weight: bold; 
@@ -53,34 +62,54 @@
             margin-top: 10px;
         }
 
-        .footer-link { text-align: center; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .footer-link { text-align: center; margin-top: 20px; }
         .footer-link a { color: #00796b; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="userView">
     <h2>Product Submission Portal</h2>
-    <p style="font-size: 14px; color: #666;">Submit your details below. Admin will review them in the Google Sheet.</p>
+    <p style="font-size: 14px; color: #666;">Submit your product details below.</p>
     
     <form id="productForm" action="https://script.google.com/macros/s/AKfycbxpMnmrBFgs5yBDlg7so61uw3DL_9DJGrUKknMUwOaLqGrVEO9kW-bya0i5jw1eDOZw/exec" method="POST">
         
         <input type="email" name="Email" placeholder="Your Email Address" required>
         <input type="tel" name="Phone" placeholder="Phone Number" required>
-        
         <textarea name="Notes" rows="4" placeholder="Notes about the product..."></textarea>
         
         <button type="submit" id="submitBtn">Submit to Admin</button>
     </form>
 
-    <p id="thanks" class="success-msg">Success! Information sent to Admin Sheet.</p>
+    <p id="thanks" class="success-msg">Success! Your information has been sent.</p>
     
     <div class="footer-link">
         <a href="index.html">← Back to Home</a>
     </div>
 </div>
 
+<div class="container admin-section">
+    <h3>Admin Control</h3>
+    
+    <div id="loginArea">
+        <input type="password" id="adminPass" placeholder="Enter Admin Password">
+        <button onclick="checkLogin()" style="background: #444;">Login to View Messages</button>
+    </div>
+
+    <div id="adminPanel" class="hidden">
+        <p style="color: #00796b; font-weight: bold;">Login Successful!</p>
+        <p>Click below to open your spreadsheet and see all messages:</p>
+        
+        <a href="https://docs.google.com/spreadsheets/d/1Pno5J9ZXCIpqd1KksXXTI_RVqPI4FSk6PH4Y7eSfAQE/edit?gid=0#gid=0" target="_blank">
+            <button style="background: #2e7d32;">Open Google Sheet Admin</button>
+        </a>
+        
+        <button onclick="location.reload()" style="background: #777; margin-top: 10px;">Logout</button>
+    </div>
+</div>
+
 <script>
+    // FORM SUBMISSION LOGIC
     const form = document.getElementById('productForm');
     const btn = document.getElementById('submitBtn');
     const thanks = document.getElementById('thanks');
@@ -88,14 +117,24 @@
     form.onsubmit = function() {
         btn.innerText = "Sending...";
         btn.disabled = true;
-        // The data is now heading to your Google Sheet!
         
-        // Optional: Show a success message after a short delay
+        // Show success message after a delay
         setTimeout(() => {
             thanks.style.display = "block";
             btn.innerText = "Sent!";
         }, 1500);
     };
+
+    // ADMIN LOGIN LOGIC
+    function checkLogin() {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === "admin123") {
+            document.getElementById('loginArea').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+        } else {
+            alert("Incorrect Password");
+        }
+    }
 </script>
 
 </body>

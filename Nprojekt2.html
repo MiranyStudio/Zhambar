@@ -3,168 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Portal | Admin</title>
+    <title>Brwa | Product Portal</title>
     <style>
-        /* CSS DESIGN SECTION */
-        :root {
-            --primary: #00ffa3; 
-            --bg: #0f172a;      
-            --card: #1e293b;    
-            --text: #f8fafc;
-            --input: #0f172a;
-        }
-
-        body { 
-            font-family: 'Inter', -apple-system, system-ui, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .card { 
-            background: var(--card);
-            width: 100%;
-            max-width: 450px;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-
-        h2 { margin: 0 0 10px 0; color: var(--primary); font-size: 24px; font-weight: 800; }
-        p { color: #94a3b8; font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
-
-        label { display: block; font-size: 11px; font-weight: 600; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-
-        input, textarea { 
-            width: 100%; 
-            padding: 14px; 
-            margin-bottom: 18px; 
-            background: var(--input);
-            border: 1px solid #334155; 
-            border-radius: 12px; 
-            color: white;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0, 255, 163, 0.1); }
-
-        button { 
-            width: 100%; 
-            padding: 16px; 
-            background: var(--primary); 
-            color: #000; 
-            border: none; 
-            border-radius: 12px; 
-            font-weight: 700; 
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
+        :root { --primary: #00ffa3; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh; }
+        .card { background: var(--card); width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); box-sizing: border-box; margin-bottom: 20px; }
+        h2 { color: var(--primary); margin: 0 0 10px 0; font-weight: 800; }
+        label { display: block; font-size: 11px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+        input, textarea { width: 100%; padding: 14px; margin-bottom: 18px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: white; font-size: 16px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); }
+        input[type="file"] { padding: 10px; background: #1e293b; border: 1px dashed var(--primary); cursor: pointer; }
+        button { width: 100%; padding: 16px; background: var(--primary); color: #000; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 16px; }
         button:hover { opacity: 0.9; transform: translateY(-2px); }
-        button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
-
-        .success-banner {
-            display: none;
-            background: rgba(0, 255, 163, 0.1);
-            color: var(--primary);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 15px;
-            font-weight: 600;
-            border: 1px solid var(--primary);
-        }
-
-        .admin-box { background: rgba(255,255,255,0.02); border: 1px dashed #334155; }
+        button:disabled { background: #334155; color: #64748b; }
+        .success-banner { display: none; background: rgba(0, 255, 163, 0.1); color: var(--primary); padding: 15px; border-radius: 10px; text-align: center; margin-top: 15px; border: 1px solid var(--primary); font-weight: bold; }
         .hidden { display: none; }
-        
-        .footer { margin-top: 20px; font-size: 12px; color: #475569; text-align: center; }
+        .footer { margin-top: auto; padding: 20px; font-size: 12px; color: #475569; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>Submit Product</h2>
-    <p>Fill in the details below. For the photo, please use a link from PostImages or Imgur.</p>
+    <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Upload a photo directly from your camera roll.</p>
     
-    <form id="productForm" action="https://script.google.com/macros/s/AKfycbxpMnmrBFgs5yBDlg7so61uw3DL_9DJGrUKknMUwOaLqGrVEO9kW-bya0i5jw1eDOZw/exec" method="POST">
+    <form id="uploadForm">
         <label>Email Address</label>
-        <input type="email" name="Email" placeholder="example@mail.com" required>
+        <input type="email" id="email" placeholder="example@mail.com" required>
         
         <label>Phone Number</label>
-        <input type="tel" name="Phone" placeholder="0750 XXX XXXX" required>
+        <input type="tel" id="phone" placeholder="0750 XXX XXXX" required>
         
-        <label>Photo URL (Link)</label>
-        <input type="url" name="Photo" placeholder="https://postimg.cc/..." required>
+        <label>Product Image</label>
+        <input type="file" id="photoFile" accept="image/*" required>
         
-        <label>Notes/Description</label>
-        <textarea name="Notes" rows="3" placeholder="Enter product details..."></textarea>
+        <label>Notes</label>
+        <textarea id="notes" rows="3" placeholder="Enter product details..."></textarea>
         
-        <button type="submit" id="submitBtn">Send to Admin</button>
+        <button type="submit" id="submitBtn">Upload to Admin</button>
     </form>
-    
-    <div id="thanks" class="success-banner">✓ Data Successfully Synced to Sheet</div>
+    <div id="thanks" class="success-banner">✓ UPLOAD SUCCESSFUL!</div>
 </div>
 
-<div class="card admin-box">
-    <h3 style="margin-top:0; color: #94a3b8; font-size: 16px;">Admin Access</h3>
-    
+<div class="card" style="border: 1px dashed #334155; background: transparent;">
+    <h3 style="margin:0 0 10px 0; font-size: 16px; color: #94a3b8;">Admin Dashboard</h3>
     <div id="loginArea">
         <input type="password" id="adminPass" placeholder="Admin Password">
-        <button onclick="checkLogin()" style="background: #334155; color: white;">Unlock Dashboard</button>
+        <button onclick="checkLogin()" style="background: #334155; color: white;">Unlock Sheet</button>
     </div>
-
     <div id="adminPanel" class="hidden">
-        <p style="color: var(--primary); margin-bottom: 10px; font-weight: bold;">Login Success ✓</p>
-        <a href="https://docs.google.com/spreadsheets/d/1Pno5J9ZXCIpqd1KksXXTI_RVqPI4FSk6PH4Y7eSfAQE/edit?gid=0#gid=0" target="_blank" style="text-decoration:none;">
-            <button style="background: white; color: black;">Open Admin Google Sheet</button>
+        <p style="color: var(--primary); margin-bottom: 10px; font-weight: bold;">Verified ✓</p>
+        <a href="https://docs.google.com/spreadsheets/d/1Pno5J9ZXCIpqd1KksXXTI_RVqPI4FSk6PH4Y7eSfAQE/edit" target="_blank" style="text-decoration:none;">
+            <button style="background: white; color: black;">Open Google Sheet</button>
         </a>
-        <button onclick="location.reload()" style="background: none; color: #ef4444; margin-top: 15px; font-size: 14px; cursor: pointer;">Logout</button>
     </div>
 </div>
 
-<div class="footer">
-    System Developed by Brwa &bull; CIS IT 2026
-</div>
+<div class="footer">Developed by Brwa &bull; CIS IT 2026</div>
 
 <script>
-    // FORM SUBMISSION LOGIC
-    const form = document.getElementById('productForm');
-    const btn = document.getElementById('submitBtn');
-    const thanks = document.getElementById('thanks');
+    // YOUR UPDATED WEB APP URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzjSl0R52XQ6joxwIMQonHL9XaWbgQ1WM1u-CJKg0oESmTNjSPJrKQ3IIwiDiGggQacgw/exec';
+    
+    const form = document.getElementById('uploadForm');
 
-    form.onsubmit = function() {
-        btn.innerText = "Uploading to Cloud...";
-        btn.disabled = true;
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const fileInput = document.getElementById('photoFile');
         
-        // Simulates a smooth transition
-        setTimeout(() => {
-            thanks.style.display = "block";
-            btn.innerText = "Data Transferred!";
-            form.reset();
-        }, 1500);
-    };
+        btn.innerText = "Processing Image...";
+        btn.disabled = true;
 
-    // ADMIN LOGIN LOGIC
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function() {
+            const base64Data = reader.result;
+            const payload = {
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                notes: document.getElementById('notes').value,
+                photo: base64Data
+            };
+
+            // Using fetch to send the JSON payload to Google
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(res => {
+                document.getElementById('thanks').style.display = "block";
+                btn.innerText = "Upload Complete!";
+                form.reset();
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                btn.disabled = false;
+                btn.innerText = "Error - Try Again";
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+
     function checkLogin() {
-        const pass = document.getElementById('adminPass').value;
-        if (pass === "admin123") {
+        if (document.getElementById('adminPass').value === "admin123") {
             document.getElementById('loginArea').classList.add('hidden');
             document.getElementById('adminPanel').classList.remove('hidden');
         } else {
-            alert("Incorrect Admin Password");
+            alert("Incorrect Password");
         }
     }
 </script>

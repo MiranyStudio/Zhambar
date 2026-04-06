@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brwa | Cloud Portal</title>
+    <title>Brwa | Live Admin Portal</title>
     <style>
         :root { --primary: #00ffa3; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
         body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
@@ -11,31 +11,32 @@
         .card { background: var(--card); width: 100%; max-width: 500px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; box-sizing: border-box; }
         
         h2 { color: var(--primary); margin: 0 0 15px 0; font-weight: 800; }
-        label { display: block; font-size: 11px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+        label { display: block; font-size: 11px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
         
         input, textarea, button { width: 100%; padding: 14px; margin-bottom: 15px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: white; font-size: 16px; box-sizing: border-box; outline: none; transition: 0.3s; }
         
         button { background: var(--primary); color: #000; font-weight: 700; border: none; cursor: pointer; }
         button:hover { opacity: 0.9; transform: translateY(-2px); }
-        button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+        button:disabled { background: #334155; color: #64748b; }
 
-        /* Mailbox UI */
-        .mail-list { margin-top: 20px; }
-        .mail-item { background: #0f172a; padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border-left: 4px solid var(--primary); border-bottom: 1px solid #334155; }
+        /* Inbox List Styles */
+        .mail-item { background: #0f172a; padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border-left: 4px solid var(--primary); border-bottom: 1px solid #334155; animation: slideIn 0.4s ease; }
         .mail-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; border: 1px solid var(--primary); cursor: pointer; }
-        .mail-info { font-size: 14px; flex: 1; }
-        .mail-info b { color: var(--primary); font-size: 15px; }
-        .mail-info p { margin: 4px 0 0 0; color: #94a3b8; font-size: 13px; line-height: 1.4; }
+        .mail-info { flex: 1; font-size: 13px; }
+        .mail-info b { color: var(--primary); font-size: 15px; display: block; margin-bottom: 2px; }
+        .mail-info span { color: #94a3b8; font-family: monospace; }
+        .mail-info p { margin: 8px 0 0 0; color: #f8fafc; line-height: 1.4; }
         
         .hidden { display: none; }
-        .loader { text-align: center; color: var(--primary); font-size: 14px; padding: 20px; font-weight: 600; }
+        .loader { text-align: center; color: var(--primary); padding: 20px; font-weight: 600; font-style: italic; }
+        
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body>
 
-<div class="card" id="formSection">
+<div class="card">
     <h2>Submit Product</h2>
-    <p style="color: #94a3b8; font-size: 14px; margin-bottom: 20px;">Upload your product info and photo to the admin mailbox.</p>
     <form id="pForm">
         <label>Email Address</label>
         <input type="email" id="email" placeholder="example@mail.com" required>
@@ -43,44 +44,46 @@
         <label>Phone Number</label>
         <input type="tel" id="phone" placeholder="0750 XXX XXXX" required>
         
-        <label>Select Photo (Gallery/Camera)</label>
+        <label>Product Photo</label>
         <input type="file" id="photo" accept="image/*" required>
         
-        <label>Product Details</label>
-        <textarea id="notes" rows="3" placeholder="Enter notes here..."></textarea>
+        <label>Extra Notes</label>
+        <textarea id="notes" rows="2" placeholder="Details about the item..."></textarea>
         
-        <button type="submit" id="sBtn">Send to Mailbox</button>
+        <button type="submit" id="sBtn">Send to Admin</button>
     </form>
 </div>
 
 <div class="card">
-    <h3 style="margin:0 0 15px 0; color: #94a3b8; font-size: 16px;">Admin Mailbox</h3>
+    <h3 style="margin:0 0 15px 0; color: #94a3b8;">Admin Mailbox</h3>
     
     <div id="loginArea">
-        <input type="password" id="adminPass" placeholder="Enter Admin Password">
+        <input type="password" id="adminPass" placeholder="Admin Password">
         <button onclick="login()" style="background: #334155; color: white;">Open Inbox</button>
     </div>
 
     <div id="mailboxArea" class="hidden">
-        <button onclick="fetchMail()" style="background: #1e293b; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px;">Refresh Messages ↻</button>
+        <button onclick="fetchMail()" style="background: #1e293b; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px; font-size: 14px;">Refresh Messages ↻</button>
         <div id="loading" class="loader hidden">Syncing with Cloud...</div>
         <div id="mailList"></div>
     </div>
 </div>
 
-<div style="font-size: 12px; color: #475569; margin-top: 20px;">Brwa &bull; CIS IT 2026</div>
+<div style="font-size: 12px; color: #475569; margin-top: 20px; padding-bottom: 20px;">
+    System by Brwa &bull; CIS IT 2026
+</div>
 
 <script>
-    // 1. YOUR UPDATED SCRIPT URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwLBh21ge-JTh1pqd_QRTvNtO9YvvkxcQAleHw6ttgvq_FrIv9KW5DVXwW4KG4tFM2ZgQ/exec';
+    // YOUR UPDATED SCRIPT URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzdB4JZNRvODCqsjotGcMTgASeejUE8BLr6dw-Cdb3ZqjZs-mh2bTCAHXlMo_QV0R8nrA/exec';
 
     const form = document.getElementById('pForm');
     const btn = document.getElementById('sBtn');
 
-    // FORM SUBMISSION (SEND DATA)
+    // 1. SUBMIT DATA (User Side)
     form.onsubmit = function(e) {
         e.preventDefault();
-        btn.innerText = "Syncing with Cloud...";
+        btn.innerText = "Syncing...";
         btn.disabled = true;
 
         const file = document.getElementById('photo').files[0];
@@ -96,32 +99,33 @@
 
             fetch(scriptURL, {
                 method: 'POST',
+                mode: 'no-cors', // Critical for sending to Google Apps Script
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert("✓ Success! Information delivered.");
-                btn.innerText = "Send to Mailbox";
+                alert("✓ Success! Message delivered to Admin.");
+                btn.innerText = "Send to Admin";
                 btn.disabled = false;
                 form.reset();
             }).catch(err => {
-                alert("Error sending data.");
+                alert("Network error. Try again.");
                 btn.disabled = false;
             });
         };
         reader.readAsDataURL(file);
     };
 
-    // ADMIN LOGIN
+    // 2. ADMIN LOGIN
     function login() {
         if(document.getElementById('adminPass').value === "admin123") {
             document.getElementById('loginArea').classList.add('hidden');
             document.getElementById('mailboxArea').classList.remove('hidden');
             fetchMail();
         } else {
-            alert("Wrong Password");
+            alert("Incorrect Password");
         }
     }
 
-    // FETCH MAIL (RECEIVE DATA)
+    // 3. FETCH MAIL (Admin Side - Direct View)
     function fetchMail() {
         const list = document.getElementById('mailList');
         const loader = document.getElementById('loading');
@@ -132,19 +136,27 @@
             .then(res => res.json())
             .then(data => {
                 loader.classList.add('hidden');
-                // Newest messages first
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:#64748b;">Inbox is empty.</p>';
+                    return;
+                }
+                // Reverse to show newest messages first
                 data.reverse().forEach(item => {
                     list.innerHTML += `
                         <div class="mail-item">
                             <img src="${item.photo}" class="mail-img" onclick="window.open(this.src)">
                             <div class="mail-info">
-                                <b>${item.email}</b><br>
-                                <span style="font-size:12px;">${item.phone}</span>
-                                <p>${item.notes || 'No extra notes provided.'}</p>
+                                <b>${item.email}</b>
+                                <span>${item.phone}</span>
+                                <p>${item.notes || 'No notes provided.'}</p>
                             </div>
                         </div>
                     `;
                 });
+            })
+            .catch(err => {
+                loader.innerText = "Error: Check URL or Permissions.";
+                console.error(err);
             });
     }
 </script>

@@ -3,109 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submission Portal</title>
+    <title>Product Portal | Admin</title>
     <style>
+        /* CSS DESIGN SECTION */
+        :root {
+            --primary: #00ffa3; 
+            --bg: #0f172a;      
+            --card: #1e293b;    
+            --text: #f8fafc;
+            --input: #0f172a;
+        }
+
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #eceff1; 
-            padding: 10px; 
-            margin: 0; 
+            font-family: 'Inter', -apple-system, system-ui, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .container { 
-            max-width: 600px; 
-            width: 95%; 
-            margin: 20px auto; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-            box-sizing: border-box; 
+
+        .card { 
+            background: var(--card);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 20px;
+            box-sizing: border-box;
         }
-        h2 { color: #00796b; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
-        
-        input, textarea, button { 
+
+        h2 { margin: 0 0 10px 0; color: var(--primary); font-size: 24px; font-weight: 800; }
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+
+        label { display: block; font-size: 11px; font-weight: 600; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+        input, textarea { 
             width: 100%; 
             padding: 14px; 
-            margin: 10px 0; 
-            border: 1px solid #ccc; 
-            border-radius: 6px; 
-            box-sizing: border-box; 
-            font-size: 16px; 
+            margin-bottom: 18px; 
+            background: var(--input);
+            border: 1px solid #334155; 
+            border-radius: 12px; 
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
         }
-        
+
+        input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0, 255, 163, 0.1); }
+
         button { 
-            background: #00796b; 
-            color: white; 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--primary); 
+            color: #000; 
             border: none; 
-            cursor: pointer; 
-            font-weight: bold; 
-            transition: 0.2s;
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        
-        button:active { background: #004d40; transform: scale(0.98); }
-        button:disabled { background: #999; cursor: not-allowed; }
 
-        .admin-section { 
-            margin-top: 30px; 
-            border-top: 2px dashed #ccc; 
-            padding-top: 20px; 
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        button:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+
+        .success-banner {
+            display: none;
+            background: rgba(0, 255, 163, 0.1);
+            color: var(--primary);
+            padding: 15px;
+            border-radius: 10px;
             text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            border: 1px solid var(--primary);
         }
 
+        .admin-box { background: rgba(255,255,255,0.02); border: 1px dashed #334155; }
         .hidden { display: none; }
         
-        .success-msg { 
-            color: #00796b; 
-            font-weight: bold; 
-            text-align: center; 
-            display: none; 
-            margin-top: 10px;
-        }
-
-        .footer-link { text-align: center; margin-top: 20px; }
-        .footer-link a { color: #00796b; text-decoration: none; font-weight: bold; }
+        .footer { margin-top: 20px; font-size: 12px; color: #475569; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="container" id="userView">
-    <h2>Product Submission Portal</h2>
-    <p style="font-size: 14px; color: #666;">Submit your product details below.</p>
+<div class="card">
+    <h2>Submit Product</h2>
+    <p>Fill in the details below. For the photo, please use a link from PostImages or Imgur.</p>
     
     <form id="productForm" action="https://script.google.com/macros/s/AKfycbxpMnmrBFgs5yBDlg7so61uw3DL_9DJGrUKknMUwOaLqGrVEO9kW-bya0i5jw1eDOZw/exec" method="POST">
+        <label>Email Address</label>
+        <input type="email" name="Email" placeholder="example@mail.com" required>
         
-        <input type="email" name="Email" placeholder="Your Email Address" required>
-        <input type="tel" name="Phone" placeholder="Phone Number" required>
-        <textarea name="Notes" rows="4" placeholder="Notes about the product..."></textarea>
+        <label>Phone Number</label>
+        <input type="tel" name="Phone" placeholder="0750 XXX XXXX" required>
         
-        <button type="submit" id="submitBtn">Submit to Admin</button>
+        <label>Photo URL (Link)</label>
+        <input type="url" name="Photo" placeholder="https://postimg.cc/..." required>
+        
+        <label>Notes/Description</label>
+        <textarea name="Notes" rows="3" placeholder="Enter product details..."></textarea>
+        
+        <button type="submit" id="submitBtn">Send to Admin</button>
     </form>
-
-    <p id="thanks" class="success-msg">Success! Your information has been sent.</p>
     
-    <div class="footer-link">
-        <a href="index.html">← Back to Home</a>
-    </div>
+    <div id="thanks" class="success-banner">✓ Data Successfully Synced to Sheet</div>
 </div>
 
-<div class="container admin-section">
-    <h3>Admin Control</h3>
+<div class="card admin-box">
+    <h3 style="margin-top:0; color: #94a3b8; font-size: 16px;">Admin Access</h3>
     
     <div id="loginArea">
-        <input type="password" id="adminPass" placeholder="Enter Admin Password">
-        <button onclick="checkLogin()" style="background: #444;">Login to View Messages</button>
+        <input type="password" id="adminPass" placeholder="Admin Password">
+        <button onclick="checkLogin()" style="background: #334155; color: white;">Unlock Dashboard</button>
     </div>
 
     <div id="adminPanel" class="hidden">
-        <p style="color: #00796b; font-weight: bold;">Login Successful!</p>
-        <p>Click below to open your spreadsheet and see all messages:</p>
-        
-        <a href="https://docs.google.com/spreadsheets/d/1Pno5J9ZXCIpqd1KksXXTI_RVqPI4FSk6PH4Y7eSfAQE/edit?gid=0#gid=0" target="_blank">
-            <button style="background: #2e7d32;">Open Google Sheet Admin</button>
+        <p style="color: var(--primary); margin-bottom: 10px; font-weight: bold;">Login Success ✓</p>
+        <a href="https://docs.google.com/spreadsheets/d/1Pno5J9ZXCIpqd1KksXXTI_RVqPI4FSk6PH4Y7eSfAQE/edit?gid=0#gid=0" target="_blank" style="text-decoration:none;">
+            <button style="background: white; color: black;">Open Admin Google Sheet</button>
         </a>
-        
-        <button onclick="location.reload()" style="background: #777; margin-top: 10px;">Logout</button>
+        <button onclick="location.reload()" style="background: none; color: #ef4444; margin-top: 15px; font-size: 14px; cursor: pointer;">Logout</button>
     </div>
+</div>
+
+<div class="footer">
+    System Developed by Brwa &bull; CIS IT 2026
 </div>
 
 <script>
@@ -115,13 +146,14 @@
     const thanks = document.getElementById('thanks');
 
     form.onsubmit = function() {
-        btn.innerText = "Sending...";
+        btn.innerText = "Uploading to Cloud...";
         btn.disabled = true;
         
-        // Show success message after a delay
+        // Simulates a smooth transition
         setTimeout(() => {
             thanks.style.display = "block";
-            btn.innerText = "Sent!";
+            btn.innerText = "Data Transferred!";
+            form.reset();
         }, 1500);
     };
 
@@ -132,7 +164,7 @@
             document.getElementById('loginArea').classList.add('hidden');
             document.getElementById('adminPanel').classList.remove('hidden');
         } else {
-            alert("Incorrect Password");
+            alert("Incorrect Admin Password");
         }
     }
 </script>

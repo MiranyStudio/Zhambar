@@ -2,139 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submission Portal</title>
     <style>
-        body { font-family: sans-serif; background: #eceff1; padding: 20px; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #00796b; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        input, textarea, button { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background: #00796b; color: white; border: none; cursor: pointer; font-weight: bold; }
-        .admin-section { margin-top: 50px; border-top: 2px dashed #ccc; padding-top: 20px; }
-        .hidden { display: none; }
-        .msg-card { background: #f9f9f9; padding: 15px; margin-bottom: 15px; border-left: 5px solid #00796b; }
-        .msg-img { max-width: 100%; height: auto; margin-top: 10px; border-radius: 4px; display: block; border: 1px solid #ddd; }
-        .clear-btn { background: #d32f2f; margin-bottom: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eceff1; padding: 10px; margin: 0; }
+        .container { max-width: 600px; width: 95%; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); box-sizing: border-box; }
+        h2 { color: #00796b; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+        input, textarea, button { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { background: #00796b; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:active { background: #004d40; transform: scale(0.98); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .admin-section { margin-top: 30px; border-top: 2px dashed #ccc; padding-top: 20px; text-align: center; }
+        .footer-link { text-align: center; margin-top: 10px; }
+        .footer-link a { color: #00796b; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container" id="submissionForm">
+<div class="container">
     <h2>Product Submission Portal</h2>
-    <p id="limitText">Messages remaining today: 30</p>
+    <p id="limitText" style="color: #666;">Daily Limit: 30 Submissions</p>
     
-    <input type="email" id="email" placeholder="Your Email Address" required>
-    <input type="tel" id="phone" placeholder="Phone Number" required>
-    <label>Upload Product Picture:</label>
-    <input type="file" id="pics" accept="image/*">
-    <textarea id="note" rows="4" placeholder="Notes about the product..."></textarea>
+    <form id="productForm" action="https://formspree.io/f/xbdpqqlr" method="POST" enctype="multipart/form-data">
+        
+        <input type="email" name="Email" placeholder="Your Email Address" required>
+        <input type="tel" name="Phone" placeholder="Phone Number" required>
+        
+        <label style="font-size: 14px; color: #555; display: block; margin-bottom: 5px;">Upload Product Picture:</label>
+        <input type="file" name="Product_Photo" accept="image/*">
+        
+        <textarea name="Notes" rows="4" placeholder="Notes about the product..."></textarea>
+        
+        <button type="submit" id="submitBtn">Submit to Admin</button>
+    </form>
     
-    <button onclick="submitProduct()">Submit to Admin</button>
-    <p><a href="index.html">← Back to Home</a></p>
+    <div class="footer-link">
+        <a href="index.html">← Back to Home</a>
+    </div>
 </div>
 
 <div class="container admin-section">
-    <h3>Admin Login</h3>
-    <div id="loginArea">
-        <input type="password" id="adminPass" placeholder="Enter Admin Password">
-        <button onclick="checkLogin()">View Submitted Messages</button>
-    </div>
-
-    <div id="adminPanel" class="hidden">
-        <h3>Submitted Messages</h3>
-        <button class="clear-btn" onclick="clearMessages()">Clear All Messages</button>
-        <div id="messageList"></div>
-        <button onclick="logout()" style="background:#555">Logout</button>
-    </div>
+    <h3>Admin Control</h3>
+    <p>To see messages from friends and other phones, check your dashboard:</p>
+    <a href="https://formspree.io/login" target="_blank">
+        <button style="background: #444;">Open Global Admin Panel</button>
+    </a>
 </div>
 
 <script>
-    let submissions = JSON.parse(localStorage.getItem('msgs')) || [];
-    let limit = 30 - submissions.length;
-    document.getElementById('limitText').innerText = `Messages remaining today: ${limit}`;
+    const form = document.getElementById('productForm');
+    const submitBtn = document.getElementById('submitBtn');
 
-    function submitProduct() {
-        if (submissions.length >= 30) {
-            alert("Daily limit reached! Please try again in 24 hours.");
-            return;
-        }
+    // Device-specific limit check
+    let today = new Date().toLocaleDateString();
+    let savedDate = localStorage.getItem('lastSubmitDate');
+    let count = parseInt(localStorage.getItem('submitCount')) || 0;
 
-        const fileInput = document.getElementById('pics');
-        const file = fileInput.files[0];
-        
-        // If there is an image, we need to read it before saving
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = function() {
-                saveData(reader.result); // Save with image data
-            };
-            reader.readAsDataURL(file);
-        } else {
-            saveData(null); // Save without image
-        }
+    // Reset counter if it's a new day
+    if (savedDate !== today) {
+        count = 0;
+        localStorage.setItem('lastSubmitDate', today);
+        localStorage.setItem('submitCount', 0);
     }
 
-    function saveData(imageData) {
-        const newEntry = {
-            email: document.getElementById('email').value,
-            phone: document.getElementById('phone').value,
-            note: document.getElementById('note').value,
-            image: imageData, // This stores the actual photo as text
-            time: new Date().toLocaleString()
-        };
-
-        submissions.push(newEntry);
-        localStorage.setItem('msgs', JSON.stringify(submissions));
-        alert("Product submitted successfully!");
-        location.reload(); 
+    if (count >= 30) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Daily Limit Reached";
     }
 
-    function checkLogin() {
-        const pass = document.getElementById('adminPass').value;
-        if (pass === "admin123") {
-            document.getElementById('loginArea').classList.add('hidden');
-            document.getElementById('adminPanel').classList.remove('hidden');
-            displayMessages();
-        } else {
-            alert("Incorrect Password");
-        }
-    }
-
-    function displayMessages() {
-        const list = document.getElementById('messageList');
-        list.innerHTML = "";
-        
-        if (submissions.length === 0) {
-            list.innerHTML = "<p>No messages yet.</p>";
-            return;
-        }
-
-        submissions.forEach(m => {
-            // Check if an image exists, if so, create an <img> tag
-            const imgTag = m.image ? `<img src="${m.image}" class="msg-img">` : `<p><em>No image provided</em></p>`;
-            
-            list.innerHTML += `<div class="msg-card">
-                <strong>From:</strong> ${m.email} <br>
-                <strong>Phone:</strong> ${m.phone} <br>
-                <strong>Note:</strong> ${m.note} <br>
-                ${imgTag}
-                <br><small>${m.time}</small>
-            </div>`;
-        });
-    }
-
-    function clearMessages() {
-        if (confirm("Are you sure you want to delete ALL submitted messages? This cannot be undone.")) {
-            localStorage.removeItem('msgs');
-            submissions = [];
-            displayMessages();
-            document.getElementById('limitText').innerText = `Messages remaining today: 30`;
-            alert("All messages cleared!");
-        }
-    }
-
-    function logout() {
-        location.reload();
-    }
+    form.onsubmit = function() {
+        // Increase counter on click
+        count++;
+        localStorage.setItem('submitCount', count);
+    };
 </script>
 
 </body>

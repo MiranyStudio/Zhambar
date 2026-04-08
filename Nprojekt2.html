@@ -57,15 +57,12 @@
             font-family: inherit;
         }
         
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
-        
         button { background: var(--primary); color: white; font-weight: 700; border: none; cursor: pointer; }
         button:hover { background: #059669; transform: translateY(-2px); }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
 
         .limit-info { font-size: 12px; color: var(--secondary); margin-bottom: 15px; text-align: left; }
 
-        /* Inbox List Styles */
         .mail-item { 
             background: #f1f5f9; 
             padding: 15px; 
@@ -75,25 +72,20 @@
             align-items: center; 
             gap: 15px; 
             border-right: 5px solid var(--primary); 
-            animation: slideIn 0.4s ease; 
             position: relative; 
         }
         .mail-img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; border: 1px solid #e2e8f0; cursor: pointer; }
         .mail-info { flex: 1; font-size: 13px; }
         .mail-info b { color: var(--primary); font-size: 15px; display: block; }
-        .mail-info span { color: var(--secondary); font-family: sans-serif; }
         
         .delete-btn { background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; width: auto; padding: 5px; margin: 0; }
         .delete-btn:hover { color: var(--danger); }
 
-        /* Image Viewer Modal */
         #imgModal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         #imgModal img { max-width: 90%; max-height: 80%; border-radius: 12px; border: 3px solid white; }
         
         .hidden { display: none; }
         .loader { text-align: center; color: var(--primary); padding: 20px; font-weight: 600; }
-        
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -108,23 +100,18 @@
     <form id="pForm">
         <label>ناونیشانی ئیمەیڵ</label>
         <input type="email" id="email" placeholder="example@mail.com" required dir="ltr">
-        
         <label>ژمارەی مۆبایل</label>
         <input type="tel" id="phone" placeholder="0750 XXX XXXX" required dir="ltr">
-        
         <label>وێنەی بەرهەم</label>
         <input type="file" id="photo" accept="image/*" required>
-        
         <label>تێبینی زیادە</label>
         <textarea id="notes" rows="2" placeholder="زانیاری دەربارەی بەرهەمەکە بنوسە..."></textarea>
-        
         <button type="submit" id="sBtn">ناردن بۆ بەڕێوبەر</button>
     </form>
 </div>
 
 <div class="card">
     <h3 style="margin:0 0 20px 0; color: var(--secondary); text-align: center;">سندوقی نامەی بەڕێوبەر</h3>
-    
     <div id="loginArea">
         <input type="password" id="adminPass" placeholder="وشەی نهێنی (Password)">
         <button onclick="login()" style="background: #334155;">چوونە ناوەوە</button>
@@ -133,26 +120,21 @@
     <div id="mailboxArea" class="hidden">
         <div style="display: flex; gap: 10px;">
             <button onclick="fetchMail()" class="btn-outline" style="flex: 2; margin-bottom: 15px;">تازەکردنەوە ↻</button>
-            <button onclick="clearAll()" style="background: #f1f5f9; color: var(--danger); border: 1px solid #fee2e2; flex: 1; margin-bottom: 15px;">سڕینەوە</button>
+            <button onclick="clearAll()" style="background: #f1f5f9; color: var(--danger); border: 1px solid #fee2e2; flex: 1; margin-bottom: 15px;">هەموو سڕینەوە</button>
         </div>
         <div id="loading" class="loader hidden">خەریکی وەرگرتنی زانیارییەکانە...</div>
         <div id="mailList"></div>
     </div>
 </div>
 
-<div style="font-size: 12px; color: #94a3b8; margin-top: 20px; padding-bottom: 20px;">
-    سیستەمی ژامبەر لەلایەن بڕوا &bull; IT CIS 2026
-</div>
-
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzdB4JZNRvODCqsjotGcMTgASeejUE8BLr6dw-Cdb3ZqjZs-mh2bTCAHXlMo_QV0R8nrA/exec';
     const MAX_MAILS = 30;
 
-    // --- DAILY LIMIT LOGIC ---
+    // --- DAILY LIMIT ---
     function getSubmissionCount() {
         const today = new Date().toLocaleDateString();
-        const storedDate = localStorage.getItem('lastSubmitDate');
-        if (storedDate !== today) {
+        if (localStorage.getItem('lastSubmitDate') !== today) {
             localStorage.setItem('lastSubmitDate', today);
             localStorage.setItem('submitCount', 0);
             return 0;
@@ -161,63 +143,47 @@
     }
 
     function updateLimitUI() {
-        const count = getSubmissionCount();
-        const remaining = MAX_MAILS - count;
+        const remaining = MAX_MAILS - getSubmissionCount();
         document.getElementById('limitDisplay').innerText = `ماوەی ڕێگەپێدراو بۆ ئەمڕۆ: ${remaining}/${MAX_MAILS}`;
         if (remaining <= 0) {
-            document.getElementById('sBtn').disabled = true;
-            document.getElementById('sBtn').innerText = "گەیشتیتە سنوری دیاریکراو";
+            const btn = document.getElementById('sBtn');
+            btn.disabled = true;
+            btn.innerText = "گەیشتیتە سنوری دیاریکراو";
         }
     }
     updateLimitUI();
 
-    // --- FORM SUBMISSION ---
     document.getElementById('pForm').onsubmit = function(e) {
         e.preventDefault();
-        const currentCount = getSubmissionCount();
-        
-        if (currentCount >= MAX_MAILS) {
-            alert("ببورە، بۆ ئەمڕۆ گەیشتیتە سنوری ٣٠ نامە.");
-            return;
-        }
+        const count = getSubmissionCount();
+        if (count >= MAX_MAILS) return alert("سنوری ٣٠ نامە تەواو بووە.");
 
         const btn = document.getElementById('sBtn');
         btn.innerText = "خەریکی ناردنە...";
         btn.disabled = true;
 
-        const file = document.getElementById('photo').files[0];
         const reader = new FileReader();
-
         reader.onload = function() {
             const payload = {
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
                 notes: document.getElementById('notes').value,
-                photo: reader.result
+                photo: reader.result,
+                timestamp: new Date().getTime() // Unique ID for deletion
             };
 
             fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
             .then(() => {
-                localStorage.setItem('submitCount', currentCount + 1);
+                localStorage.setItem('submitCount', count + 1);
                 updateLimitUI();
                 alert("✓ بە سەرکەوتوویی نێردرا!");
-                btn.innerText = "ناردن بۆ بەڕێوبەر";
-                btn.disabled = false;
-                document.getElementById('pForm').reset();
-            }).catch(() => {
-                alert("هەڵەیەک ڕوویدا، دووبارە هەوڵ بدەرەوە.");
-                btn.disabled = false;
+                location.reload(); 
             });
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(document.getElementById('photo').files[0]);
     };
 
-    // --- ADMIN FUNCTIONS ---
-    function openImg(src) {
-        document.getElementById('imgModal').style.display = "flex";
-        document.getElementById('modalImg').src = src;
-    }
-
+    // --- ADMIN LOGIC ---
     function login() {
         if(document.getElementById('adminPass').value === "admin123") {
             document.getElementById('loginArea').classList.add('hidden');
@@ -229,34 +195,65 @@
     function fetchMail() {
         const list = document.getElementById('mailList');
         const loader = document.getElementById('loading');
+        const deletedIds = JSON.parse(localStorage.getItem('deletedMails') || "[]");
+        
         list.innerHTML = '';
         loader.classList.remove('hidden');
 
         fetch(scriptURL).then(res => res.json()).then(data => {
             loader.classList.add('hidden');
-            if(data.length === 0) {
+            // Filter out mails that were previously deleted locally
+            const activeData = data.filter(item => !deletedIds.includes(item.email + item.phone));
+
+            if(activeData.length === 0) {
                 list.innerHTML = '<p style="text-align:center; color:#94a3b8;">هیچ نامەیەک نییە.</p>';
                 return;
             }
-            data.reverse().forEach((item, index) => {
+
+            activeData.reverse().forEach((item) => {
+                const uniqueId = item.email + item.phone;
                 list.innerHTML += `
-                    <div class="mail-item" id="msg-${index}">
+                    <div class="mail-item" id="id-${uniqueId}">
                         <img src="${item.photo}" class="mail-img" onclick="openImg(this.src)">
                         <div class="mail-info">
                             <b>${item.email}</b>
                             <span dir="ltr">${item.phone}</span>
                             <p>${item.notes || 'تێبینی نییە'}</p>
                         </div>
-                        <button class="delete-btn" onclick="removeUI('msg-${index}')">✕</button>
+                        <button class="delete-btn" onclick="removePermanently('${uniqueId}')">✕</button>
                     </div>`;
             });
-        }).catch(() => {
-            loader.innerText = "هەڵە لە وەرگرتنی زانیاری.";
         });
     }
 
-    function removeUI(id) { if(confirm("ئایا دڵنیایت لە سڕینەوە؟")) document.getElementById(id).style.display = 'none'; }
-    function clearAll() { if(confirm("ئایا هەموو لیستەکە پاک دەەکەیتەوە؟")) document.getElementById('mailList').innerHTML = ''; }
+    function removePermanently(uniqueId) {
+        if(confirm("ئایا دڵنیایت لە سڕینەوە؟")) {
+            let deletedIds = JSON.parse(localStorage.getItem('deletedMails') || "[]");
+            deletedIds.push(uniqueId);
+            localStorage.setItem('deletedMails', JSON.stringify(deletedIds));
+            document.getElementById(`id-${uniqueId}`).remove();
+        }
+    }
+
+    function clearAll() {
+        if(confirm("ئایا هەموو لیستەکە پاک دەەکەیتەوە؟")) {
+            localStorage.setItem('deletedMails', JSON.stringify([])); // Reset if you want to see all again, OR:
+            // To hide everything forever:
+            const allItems = document.querySelectorAll('.mail-item');
+            let deletedIds = JSON.parse(localStorage.getItem('deletedMails') || "[]");
+            allItems.forEach(item => {
+                const id = item.id.replace('id-', '');
+                if(!deletedIds.includes(id)) deletedIds.push(id);
+            });
+            localStorage.setItem('deletedMails', JSON.stringify(deletedIds));
+            fetchMail();
+        }
+    }
+
+    function openImg(src) {
+        document.getElementById('imgModal').style.display = "flex";
+        document.getElementById('modalImg').src = src;
+    }
 </script>
 </body>
 </html>

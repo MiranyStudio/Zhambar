@@ -17,7 +17,9 @@
         
         button { background: var(--primary); color: #000; font-weight: 700; border: none; cursor: pointer; }
         button:hover { opacity: 0.9; transform: translateY(-2px); }
-        .btn-danger { background: var(--danger); color: white; margin-top: 10px; }
+        .btn-danger { background: var(--danger); color: white; }
+
+        .limit-info { font-size: 12px; color: #94a3b8; margin-bottom: 15px; text-align: right; }
 
         /* Inbox List Styles */
         .mail-item { background: #0f172a; padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border-left: 4px solid var(--primary); border-bottom: 1px solid #334155; animation: slideIn 0.4s ease; position: relative; }
@@ -29,7 +31,7 @@
         .delete-btn { background: none; border: none; color: #64748b; font-size: 18px; cursor: pointer; width: auto; padding: 5px; margin: 0; }
         .delete-btn:hover { color: var(--danger); }
 
-        /* Modal for Image Viewing */
+        /* Modal */
         #imgModal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         #imgModal img { max-width: 90%; max-height: 80%; border-radius: 10px; border: 2px solid var(--primary); }
         
@@ -43,11 +45,11 @@
 
 <div id="imgModal" onclick="this.style.display='none'">
     <img id="modalImg" src="">
-    <p style="position: absolute; bottom: 20px; color: white;">Click anywhere to close</p>
 </div>
 
 <div class="card">
     <h2>Submit Product</h2>
+    <div class="limit-info" id="limitDisplay">Remaining today: 30/30</div>
     <form id="pForm">
         <label>Email Address</label>
         <input type="email" id="email" placeholder="example@mail.com" required>
@@ -56,25 +58,23 @@
         <label>Product Photo</label>
         <input type="file" id="photo" accept="image/*" required>
         <label>Extra Notes</label>
-        <textarea id="notes" rows="2" placeholder="Details about the item..."></textarea>
+        <textarea id="notes" rows="2" placeholder="Details..."></textarea>
         <button type="submit" id="sBtn">Send to Admin</button>
     </form>
 </div>
 
 <div class="card">
     <h3 style="margin:0 0 15px 0; color: #94a3b8;">Admin Mailbox</h3>
-    
     <div id="loginArea">
         <input type="password" id="adminPass" placeholder="Admin Password">
         <button onclick="login()" style="background: #334155; color: white;">Open Inbox</button>
     </div>
-
     <div id="mailboxArea" class="hidden">
         <div style="display: flex; gap: 10px;">
             <button onclick="fetchMail()" style="background: #1e293b; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px; font-size: 14px; flex: 2;">Refresh ↻</button>
             <button onclick="clearAll()" style="background: #1e293b; color: var(--danger); border: 1px solid var(--danger); margin-bottom: 15px; font-size: 14px; flex: 1;">Clear View</button>
         </div>
-        <div id="loading" class="loader hidden">Syncing with Cloud...</div>
+        <div id="loading" class="loader hidden">Syncing...</div>
         <div id="mailList"></div>
     </div>
 </div>
@@ -85,21 +85,42 @@
 
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzdB4JZNRvODCqsjotGcMTgASeejUE8BLr6dw-Cdb3ZqjZs-mh2bTCAHXlMo_QV0R8nrA/exec';
+    const MAX_MAILS = 30;
 
-    // 1. IMAGE MODAL VIEW
-    function openImg(src) {
-        const modal = document.getElementById('imgModal');
-        const modalImg = document.getElementById('modalImg');
-        modal.style.display = "flex";
-        modalImg.src = src;
+    // --- DAILY LIMIT LOGIC ---
+    function getSubmissionCount() {
+        const today = new Date().toLocaleDateString();
+        const storedDate = localStorage.getItem('lastSubmitDate');
+        if (storedDate !== today) {
+            localStorage.setItem('lastSubmitDate', today);
+            localStorage.setItem('submitCount', 0);
+            return 0;
+        }
+        return parseInt(localStorage.getItem('submitCount')) || 0;
     }
 
-    // 2. SUBMIT DATA
-    const form = document.getElementById('pForm');
-    const btn = document.getElementById('sBtn');
+    function updateLimitUI() {
+        const count = getSubmissionCount();
+        const remaining = MAX_MAILS - count;
+        document.getElementById('limitDisplay').innerText = `Remaining today: ${remaining}/${MAX_MAILS}`;
+        if (remaining <= 0) {
+            document.getElementById('sBtn').disabled = true;
+            document.getElementById('sBtn').innerText = "Daily Limit Reached";
+        }
+    }
+    updateLimitUI();
 
-    form.onsubmit = function(e) {
+    // --- FORM SUBMISSION ---
+    document.getElementById('pForm').onsubmit = function(e) {
         e.preventDefault();
+        const currentCount = getSubmissionCount();
+        
+        if (currentCount >= MAX_MAILS) {
+            alert("Daily limit of 30 reached.");
+            return;
+        }
+
+        const btn = document.getElementById('sBtn');
         btn.innerText = "Syncing...";
         btn.disabled = true;
 
@@ -114,80 +135,61 @@
                 photo: reader.result
             };
 
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(payload)
-            }).then(() => {
-                alert("✓ Success! Message delivered.");
+            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+            .then(() => {
+                localStorage.setItem('submitCount', currentCount + 1);
+                updateLimitUI();
+                alert("✓ Success!");
                 btn.innerText = "Send to Admin";
                 btn.disabled = false;
-                form.reset();
-            }).catch(err => {
-                alert("Network error.");
+                document.getElementById('pForm').reset();
+            }).catch(() => {
+                alert("Error.");
                 btn.disabled = false;
             });
         };
         reader.readAsDataURL(file);
     };
 
-    // 3. ADMIN LOGIN
+    // --- ADMIN FUNCTIONS ---
+    function openImg(src) {
+        document.getElementById('imgModal').style.display = "flex";
+        document.getElementById('modalImg').src = src;
+    }
+
     function login() {
         if(document.getElementById('adminPass').value === "admin123") {
             document.getElementById('loginArea').classList.add('hidden');
             document.getElementById('mailboxArea').classList.remove('hidden');
             fetchMail();
-        } else {
-            alert("Incorrect Password");
-        }
+        } else { alert("Wrong Password"); }
     }
 
-    // 4. FETCH AND MANAGE MAIL
     function fetchMail() {
         const list = document.getElementById('mailList');
         const loader = document.getElementById('loading');
         list.innerHTML = '';
         loader.classList.remove('hidden');
 
-        fetch(scriptURL)
-            .then(res => res.json())
-            .then(data => {
-                loader.classList.add('hidden');
-                if (data.length === 0) {
-                    list.innerHTML = '<p style="text-align:center; color:#64748b;">Inbox is empty.</p>';
-                    return;
-                }
-                data.reverse().forEach((item, index) => {
-                    list.innerHTML += `
-                        <div class="mail-item" id="msg-${index}">
-                            <img src="${item.photo}" class="mail-img" onclick="openImg(this.src)">
-                            <div class="mail-info">
-                                <b>${item.email}</b>
-                                <span style="font-family: monospace; color: #94a3b8;">${item.phone}</span>
-                                <p>${item.notes || 'No notes provided.'}</p>
-                            </div>
-                            <button class="delete-btn" onclick="removeUI('msg-${index}')">✕</button>
+        fetch(scriptURL).then(res => res.json()).then(data => {
+            loader.classList.add('hidden');
+            data.reverse().forEach((item, index) => {
+                list.innerHTML += `
+                    <div class="mail-item" id="msg-${index}">
+                        <img src="${item.photo}" class="mail-img" onclick="openImg(this.src)">
+                        <div class="mail-info">
+                            <b>${item.email}</b>
+                            <span>${item.phone}</span>
+                            <p>${item.notes || ''}</p>
                         </div>
-                    `;
-                });
-            })
-            .catch(err => {
-                loader.innerText = "Error syncing data.";
+                        <button class="delete-btn" onclick="removeUI('msg-${index}')">✕</button>
+                    </div>`;
             });
+        });
     }
 
-    function removeUI(id) {
-        if(confirm("Remove this message from view?")) {
-            document.getElementById(id).style.display = 'none';
-        }
-    }
-
-    function clearAll() {
-        if(confirm("Clear the entire local view?")) {
-            document.getElementById('mailList').innerHTML = '<p style="text-align:center; color:#64748b;">Inbox cleared.</p>';
-        }
-    }
+    function removeUI(id) { if(confirm("Remove?")) document.getElementById(id).style.display = 'none'; }
+    function clearAll() { if(confirm("Clear view?")) document.getElementById('mailList').innerHTML = ''; }
 </script>
-
 </body>
 </html>

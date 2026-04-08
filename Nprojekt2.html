@@ -15,23 +15,30 @@
         input, textarea, button { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #cbd5e1; box-sizing: border-box; font-family: inherit; }
         
         button { background: var(--primary); color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        button:hover { opacity: 0.9; }
         
-        /* Inbox Style */
-        .mail-item { background: #f1f5f9; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; border-right: 5px solid var(--primary); position: relative; }
-        .mail-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; }
+        .mail-item { background: #f1f5f9; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; border-right: 5px solid var(--primary); }
+        .mail-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
+        .mail-img:hover { transform: scale(1.05); }
+        
         .mail-info { flex: 1; font-size: 14px; }
         .mail-info b { color: var(--primary); display: block; }
-        .mail-info span { color: #64748b; font-size: 12px; }
         
         .delete-btn { background: none; color: #94a3b8; border: none; cursor: pointer; font-size: 18px; width: auto; margin: 0; padding: 5px; }
-        .delete-btn:hover { color: var(--danger); }
 
+        /* Modal / Pop-up Window */
+        #imgModal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; cursor: zoom-out; }
+        #imgModal img { max-width: 90%; max-height: 85%; border-radius: 15px; border: 3px solid white; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        
         .hidden { display: none; }
         .loader { text-align: center; padding: 10px; color: var(--primary); font-weight: bold; }
     </style>
 </head>
 <body>
+
+<div id="imgModal" onclick="this.style.display='none'">
+    <img id="modalImg" src="">
+</div>
 
 <div class="card">
     <h2>ناردنی بەرهەم</h2>
@@ -60,7 +67,6 @@
 </div>
 
 <script>
-    // PASTE YOUR SCRIPT LINK HERE
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxEgG9ZhH9sfz-f0qByOKt-IuLon_QYjM3BrkasjaTGpzWAWOn6awx3vu9KZz2r9Tsg/exec';
 
     function login() {
@@ -69,6 +75,12 @@
             document.getElementById('mailboxArea').classList.remove('hidden');
             fetchMail();
         } else { alert("وشەی نهێنی هەڵەیە!"); }
+    }
+
+    // Function to open the Pop-up image
+    function openPreview(src) {
+        document.getElementById('modalImg').src = src;
+        document.getElementById('imgModal').style.display = 'flex';
     }
 
     function fetchMail() {
@@ -88,11 +100,11 @@
                 data.reverse().forEach(item => {
                     list.innerHTML += `
                         <div class="mail-item" id="row-${item.rowId}">
-                            <img src="${item.photo}" class="mail-img" onclick="window.open(this.src)">
+                            <img src="${item.photo}" class="mail-img" onclick="openPreview(this.src)">
                             <div class="mail-info">
                                 <b>${item.email}</b>
                                 <span dir="ltr">${item.phone}</span>
-                                <p style="margin: 5px 0 0 0;">${item.notes || ''}</p>
+                                <p style="margin: 5px 0 0 0; font-size:13px;">${item.notes || ''}</p>
                             </div>
                             <button class="delete-btn" onclick="serverDelete(${item.rowId})">✕</button>
                         </div>`;
@@ -101,23 +113,18 @@
     }
 
     function serverDelete(rowId) {
-        if(!confirm("ئایا دڵنیای لە سڕینەوەی ئەم نامەیە بە تەواوی؟")) return;
+        if(!confirm("ئایا دڵنیای لە سڕینەوە؟")) return;
         
-        // Visual feedback
         const element = document.getElementById(`row-${rowId}`);
         element.style.opacity = "0.3";
         element.style.pointerEvents = "none";
 
-        // Tell Google Sheets to mark as DELETED
         fetch(scriptURL, {
             method: 'POST',
             mode: 'no-cors',
             body: JSON.stringify({ command: "DELETE", rowId: rowId })
         }).then(() => {
             element.remove();
-        }).catch(() => {
-            alert("هەڵەیەک ڕوویدا لە سڕینەوەدا.");
-            element.style.opacity = "1";
         });
     }
 
@@ -127,23 +134,23 @@
         btn.innerText = "خەریکی ناردنە...";
         btn.disabled = true;
 
-        const file = document.getElementById('photo').files[0];
         const reader = new FileReader();
         reader.onload = function() {
-            const payload = {
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                notes: document.getElementById('notes').value,
-                photo: reader.result
-            };
-
-            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-            .then(() => {
-                alert("✓ بە سەرکەوتوویی نێردرا!");
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    notes: document.getElementById('notes').value,
+                    photo: reader.result
+                })
+            }).then(() => {
+                alert("✓ نێردرا!");
                 location.reload();
             });
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(document.getElementById('photo').files[0]);
     };
 </script>
 </body>

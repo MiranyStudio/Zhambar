@@ -4,186 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ژامبەر | پۆرتاڵی بەڕێوبەر</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary: #10b981; 
-            --bg: #f8fafc; 
-            --card: #ffffff; 
-            --text: #1e293b; 
-            --danger: #ef4444; 
-            --secondary: #64748b;
-        }
+        :root { --primary: #10b981; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --danger: #ef4444; }
+        body { font-family: 'Noto Sans Arabic', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        body { 
-            font-family: 'Noto Sans Arabic', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            padding: 20px; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
-        }
+        .card { background: var(--card); width: 100%; max-width: 500px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 20px; box-sizing: border-box; }
         
-        .card { 
-            background: var(--card); 
-            width: 100%; 
-            max-width: 500px; 
-            padding: 30px; 
-            border-radius: 24px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            border: 1px solid #e2e8f0; 
-            margin-bottom: 25px; 
-            box-sizing: border-box; 
-        }
+        h2 { color: var(--primary); text-align: center; margin-top: 0; }
+        input, textarea, button { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #cbd5e1; box-sizing: border-box; font-family: inherit; }
         
-        h2 { color: var(--primary); margin: 0 0 20px 0; font-weight: 700; font-size: 1.5rem; text-align: center; }
-        label { display: block; font-size: 13px; color: var(--secondary); margin-bottom: 8px; font-weight: bold; }
+        button { background: var(--primary); color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
         
-        input, textarea, button { 
-            width: 100%; 
-            padding: 14px; 
-            margin-bottom: 15px; 
-            background: #fff; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 12px; 
-            color: var(--text); 
-            font-size: 16px; 
-            box-sizing: border-box; 
-            outline: none; 
-            transition: 0.3s; 
-            font-family: inherit;
-        }
+        /* Inbox Style */
+        .mail-item { background: #f1f5f9; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; border-right: 5px solid var(--primary); position: relative; }
+        .mail-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 1px solid #ddd; }
+        .mail-info { flex: 1; font-size: 14px; }
+        .mail-info b { color: var(--primary); display: block; }
+        .mail-info span { color: #64748b; font-size: 12px; }
         
-        button { background: var(--primary); color: white; font-weight: 700; border: none; cursor: pointer; }
-        button:hover { background: #059669; transform: translateY(-2px); }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-
-        .limit-info { font-size: 12px; color: var(--secondary); margin-bottom: 15px; text-align: left; }
-
-        .mail-item { 
-            background: #f1f5f9; 
-            padding: 15px; 
-            border-radius: 15px; 
-            margin-bottom: 12px; 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            border-right: 5px solid var(--primary); 
-            position: relative; 
-        }
-        .mail-img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; border: 1px solid #e2e8f0; cursor: pointer; }
-        .mail-info { flex: 1; font-size: 13px; }
-        .mail-info b { color: var(--primary); font-size: 15px; display: block; }
-        
-        .delete-btn { background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; width: auto; padding: 5px; margin: 0; }
+        .delete-btn { background: none; color: #94a3b8; border: none; cursor: pointer; font-size: 18px; width: auto; margin: 0; padding: 5px; }
         .delete-btn:hover { color: var(--danger); }
 
-        #imgModal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
-        #imgModal img { max-width: 90%; max-height: 80%; border-radius: 12px; border: 3px solid white; }
-        
         .hidden { display: none; }
-        .loader { text-align: center; color: var(--primary); padding: 20px; font-weight: 600; }
+        .loader { text-align: center; padding: 10px; color: var(--primary); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="imgModal" onclick="this.style.display='none'">
-    <img id="modalImg" src="">
-</div>
-
 <div class="card">
     <h2>ناردنی بەرهەم</h2>
-    <div class="limit-info" id="limitDisplay">ماوەی ڕێگەپێدراو بۆ ئەمڕۆ: 30/30</div>
     <form id="pForm">
-        <label>ناونیشانی ئیمەیڵ</label>
-        <input type="email" id="email" placeholder="example@mail.com" required dir="ltr">
-        <label>ژمارەی مۆبایل</label>
-        <input type="tel" id="phone" placeholder="0750 XXX XXXX" required dir="ltr">
-        <label>وێنەی بەرهەم</label>
+        <input type="email" id="email" placeholder="ئیمەیڵ (Email)" required dir="ltr">
+        <input type="tel" id="phone" placeholder="ژمارەی مۆبایل" required dir="ltr">
         <input type="file" id="photo" accept="image/*" required>
-        <label>تێبینی زیادە</label>
-        <textarea id="notes" rows="2" placeholder="زانیاری دەربارەی بەرهەمەکە بنوسە..."></textarea>
+        <textarea id="notes" rows="2" placeholder="تێبینی زیادە..."></textarea>
         <button type="submit" id="sBtn">ناردن بۆ بەڕێوبەر</button>
     </form>
 </div>
 
 <div class="card">
-    <h3 style="margin:0 0 20px 0; color: var(--secondary); text-align: center;">سندوقی نامەی بەڕێوبەر</h3>
+    <h3 style="text-align: center; color: #64748b;">سندوقی نامەکان</h3>
+    
     <div id="loginArea">
-        <input type="password" id="adminPass" placeholder="وشەی نهێنی (Password)">
+        <input type="password" id="adminPass" placeholder="وشەی نهێنی">
         <button onclick="login()" style="background: #334155;">چوونە ناوەوە</button>
     </div>
 
     <div id="mailboxArea" class="hidden">
-        <div style="display: flex; gap: 10px;">
-            <button onclick="fetchMail()" class="btn-outline" style="flex: 2; margin-bottom: 15px;">تازەکردنەوە ↻</button>
-            <button onclick="clearAll()" style="background: #f1f5f9; color: var(--danger); border: 1px solid #fee2e2; flex: 1; margin-bottom: 15px;">هەموو سڕینەوە</button>
-        </div>
+        <button onclick="fetchMail()" style="background: white; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px;">تازەکردنەوە ↻</button>
         <div id="loading" class="loader hidden">خەریکی وەرگرتنی زانیارییەکانە...</div>
         <div id="mailList"></div>
     </div>
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzdB4JZNRvODCqsjotGcMTgASeejUE8BLr6dw-Cdb3ZqjZs-mh2bTCAHXlMo_QV0R8nrA/exec';
-    const MAX_MAILS = 30;
+    // PASTE YOUR SCRIPT LINK HERE
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxEgG9ZhH9sfz-f0qByOKt-IuLon_QYjM3BrkasjaTGpzWAWOn6awx3vu9KZz2r9Tsg/exec';
 
-    // --- DAILY LIMIT ---
-    function getSubmissionCount() {
-        const today = new Date().toLocaleDateString();
-        if (localStorage.getItem('lastSubmitDate') !== today) {
-            localStorage.setItem('lastSubmitDate', today);
-            localStorage.setItem('submitCount', 0);
-            return 0;
-        }
-        return parseInt(localStorage.getItem('submitCount')) || 0;
-    }
-
-    function updateLimitUI() {
-        const remaining = MAX_MAILS - getSubmissionCount();
-        document.getElementById('limitDisplay').innerText = `ماوەی ڕێگەپێدراو بۆ ئەمڕۆ: ${remaining}/${MAX_MAILS}`;
-        if (remaining <= 0) {
-            const btn = document.getElementById('sBtn');
-            btn.disabled = true;
-            btn.innerText = "گەیشتیتە سنوری دیاریکراو";
-        }
-    }
-    updateLimitUI();
-
-    document.getElementById('pForm').onsubmit = function(e) {
-        e.preventDefault();
-        const count = getSubmissionCount();
-        if (count >= MAX_MAILS) return alert("سنوری ٣٠ نامە تەواو بووە.");
-
-        const btn = document.getElementById('sBtn');
-        btn.innerText = "خەریکی ناردنە...";
-        btn.disabled = true;
-
-        const reader = new FileReader();
-        reader.onload = function() {
-            const payload = {
-                email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                notes: document.getElementById('notes').value,
-                photo: reader.result,
-                timestamp: new Date().getTime() // Unique ID for deletion
-            };
-
-            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
-            .then(() => {
-                localStorage.setItem('submitCount', count + 1);
-                updateLimitUI();
-                alert("✓ بە سەرکەوتوویی نێردرا!");
-                location.reload(); 
-            });
-        };
-        reader.readAsDataURL(document.getElementById('photo').files[0]);
-    };
-
-    // --- ADMIN LOGIC ---
     function login() {
         if(document.getElementById('adminPass').value === "admin123") {
             document.getElementById('loginArea').classList.add('hidden');
@@ -195,65 +74,77 @@
     function fetchMail() {
         const list = document.getElementById('mailList');
         const loader = document.getElementById('loading');
-        const deletedIds = JSON.parse(localStorage.getItem('deletedMails') || "[]");
-        
         list.innerHTML = '';
         loader.classList.remove('hidden');
 
-        fetch(scriptURL).then(res => res.json()).then(data => {
-            loader.classList.add('hidden');
-            // Filter out mails that were previously deleted locally
-            const activeData = data.filter(item => !deletedIds.includes(item.email + item.phone));
-
-            if(activeData.length === 0) {
-                list.innerHTML = '<p style="text-align:center; color:#94a3b8;">هیچ نامەیەک نییە.</p>';
-                return;
-            }
-
-            activeData.reverse().forEach((item) => {
-                const uniqueId = item.email + item.phone;
-                list.innerHTML += `
-                    <div class="mail-item" id="id-${uniqueId}">
-                        <img src="${item.photo}" class="mail-img" onclick="openImg(this.src)">
-                        <div class="mail-info">
-                            <b>${item.email}</b>
-                            <span dir="ltr">${item.phone}</span>
-                            <p>${item.notes || 'تێبینی نییە'}</p>
-                        </div>
-                        <button class="delete-btn" onclick="removePermanently('${uniqueId}')">✕</button>
-                    </div>`;
+        fetch(scriptURL)
+            .then(res => res.json())
+            .then(data => {
+                loader.classList.add('hidden');
+                if(data.length === 0) {
+                    list.innerHTML = '<p style="text-align:center;">هیچ نامەیەک نییە.</p>';
+                    return;
+                }
+                data.reverse().forEach(item => {
+                    list.innerHTML += `
+                        <div class="mail-item" id="row-${item.rowId}">
+                            <img src="${item.photo}" class="mail-img" onclick="window.open(this.src)">
+                            <div class="mail-info">
+                                <b>${item.email}</b>
+                                <span dir="ltr">${item.phone}</span>
+                                <p style="margin: 5px 0 0 0;">${item.notes || ''}</p>
+                            </div>
+                            <button class="delete-btn" onclick="serverDelete(${item.rowId})">✕</button>
+                        </div>`;
+                });
             });
+    }
+
+    function serverDelete(rowId) {
+        if(!confirm("ئایا دڵنیای لە سڕینەوەی ئەم نامەیە بە تەواوی؟")) return;
+        
+        // Visual feedback
+        const element = document.getElementById(`row-${rowId}`);
+        element.style.opacity = "0.3";
+        element.style.pointerEvents = "none";
+
+        // Tell Google Sheets to mark as DELETED
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ command: "DELETE", rowId: rowId })
+        }).then(() => {
+            element.remove();
+        }).catch(() => {
+            alert("هەڵەیەک ڕوویدا لە سڕینەوەدا.");
+            element.style.opacity = "1";
         });
     }
 
-    function removePermanently(uniqueId) {
-        if(confirm("ئایا دڵنیایت لە سڕینەوە؟")) {
-            let deletedIds = JSON.parse(localStorage.getItem('deletedMails') || "[]");
-            deletedIds.push(uniqueId);
-            localStorage.setItem('deletedMails', JSON.stringify(deletedIds));
-            document.getElementById(`id-${uniqueId}`).remove();
-        }
-    }
+    document.getElementById('pForm').onsubmit = function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('sBtn');
+        btn.innerText = "خەریکی ناردنە...";
+        btn.disabled = true;
 
-    function clearAll() {
-        if(confirm("ئایا هەموو لیستەکە پاک دەەکەیتەوە؟")) {
-            localStorage.setItem('deletedMails', JSON.stringify([])); // Reset if you want to see all again, OR:
-            // To hide everything forever:
-            const allItems = document.querySelectorAll('.mail-item');
-            let deletedIds = JSON.parse(localStorage.getItem('deletedMails') || "[]");
-            allItems.forEach(item => {
-                const id = item.id.replace('id-', '');
-                if(!deletedIds.includes(id)) deletedIds.push(id);
+        const file = document.getElementById('photo').files[0];
+        const reader = new FileReader();
+        reader.onload = function() {
+            const payload = {
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                notes: document.getElementById('notes').value,
+                photo: reader.result
+            };
+
+            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+            .then(() => {
+                alert("✓ بە سەرکەوتوویی نێردرا!");
+                location.reload();
             });
-            localStorage.setItem('deletedMails', JSON.stringify(deletedIds));
-            fetchMail();
-        }
-    }
-
-    function openImg(src) {
-        document.getElementById('imgModal').style.display = "flex";
-        document.getElementById('modalImg').src = src;
-    }
+        };
+        reader.readAsDataURL(file);
+    };
 </script>
 </body>
 </html>

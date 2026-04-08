@@ -1,111 +1,228 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedBridge Solutions | Pharmacy Wholesale</title>
+    <title>کۆگای دەرمانی ژامبەر | Zhambar Pharma</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            line-height: 1.6; 
-            color: #333; 
-            background: #fff;
-        }
-        
-        header { 
-            background: #004d40; 
-            color: white; 
-            padding: 3rem 1rem; /* Added horizontal padding for mobile */
-            text-align: center; 
+        :root {
+            --primary: #059669; /* Emerald 600 */
+            --primary-dark: #064e3b; /* Emerald 900 */
+            --accent: #10b981;
+            --bg: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
         }
 
+        body { 
+            font-family: 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif; 
+            margin: 0; 
+            line-height: 1.8; 
+            color: var(--text-dark); 
+            background: var(--bg);
+        }
+
+        /* Modern Header */
+        header { 
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); 
+            color: white; 
+            padding: 4rem 1rem; 
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 10px auto 0;
+        }
+
+        /* Clean Navigation */
         nav { 
-            background: #00796b; 
-            padding: 15px; 
+            background: white; 
+            padding: 0; 
             text-align: center; 
             display: flex;
-            flex-wrap: wrap; /* Allows links to wrap on small screens */
             justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         nav a { 
-            color: white; 
-            margin: 5px 15px; 
+            color: var(--text-dark); 
+            padding: 20px 25px;
             text-decoration: none; 
-            font-weight: bold; 
-            font-size: 1.1rem;
+            font-weight: 600; 
+            font-size: 1rem;
+            transition: 0.3s;
+            border-bottom: 3px solid transparent;
         }
 
+        nav a:hover { 
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background: #f0fdf4;
+        }
+
+        /* Hero Section */
         .hero { 
-            padding: 60px 20px; 
+            padding: 80px 20px; 
             text-align: center; 
-            background: #f4f4f4; 
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .hero h2 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
+            font-size: 2.2rem;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
         }
 
+        .hero p {
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: var(--text-light);
+            font-size: 1.2rem;
+        }
+
+        /* Action Button */
         .mailbox-btn { 
-            background: #ff5722; 
+            background: var(--primary); 
             color: white; 
-            padding: 15px 25px; 
-            border-radius: 50px; 
+            padding: 18px 40px; 
+            border-radius: 12px; 
             text-decoration: none; 
+            font-weight: 700;
             font-size: 1.1rem;
-            display: inline-block; 
-            margin-top: 20px; 
-            transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
-            max-width: 90%; /* Prevents button from going off-screen */
-            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
         }
 
         .mailbox-btn:hover { 
-            background: #e64a19; 
-            transform: translateY(-2px); 
+            background: var(--primary-dark); 
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.4);
         }
 
+        /* Content Section */
         section { 
-            padding: 40px 20px; 
-            max-width: 800px; 
+            padding: 60px 20px; 
+            max-width: 900px; 
             margin: auto; 
         }
 
-        /* iPad and Tablet Adjustments */
-        @media (min-width: 768px) {
-            header { padding: 4rem 2rem; }
-            .hero h2 { font-size: 2.5rem; }
-            .hero { padding: 80px 40px; }
+        .about-card {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+        }
+
+        h3 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            border-right: 5px solid var(--primary);
+            padding-right: 15px;
+        }
+
+        /* Social Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            background: #f1f5f9;
+            margin-top: 40px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .fb { background: #1877F2; }
+        .ig { background: #E4405F; }
+        .social-btn:hover { opacity: 0.8; transform: scale(1.05); }
+
+        .copyright {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 { font-size: 2rem; }
+            .hero h2 { font-size: 1.5rem; }
+            nav { flex-direction: row; font-size: 0.9rem; }
+            nav a { padding: 15px 10px; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>MedBridge Solutions</h1>
-    <p>Distributing Excellence to Every Pharmacy</p>
+    <h1>کۆگای دەرمانی ژامبەر</h1>
+    <p>کۆگای دەرمانی ژامبەر سەرچاوەیەکی باوەڕپێکراوە بۆ دابینکردنی دەرمانی ڕەسەن و کوالیتی بەرز بە شێوەیەکی پیشەیی و ڕێکخراو.</p>
 </header>
 
 <nav>
-    <a href="#">Home</a>
-    <a href="#">Our Products</a>
-    <a href="#">Partnerships</a>
+    <a href="#">سەرەتا</a>
+    <a href="#">بەرهەمەکانمان</a>
+    <a href="#">هاوبەشییەکان</a>
 </nav>
 
 <div class="hero">
-    <h2>Empowering Small Labs, Supplying Big Pharmacies</h2>
-    <p>We source high-quality medical products from emerging companies and bring them to your shelves.</p>
+    <h2>پەیوەندییەکی ڕاستەوخۆ بۆ دابینکردنی دەرمان</h2>
+    <p>ئێمە پردی پەیوەندی نێوان کۆمپانیا بەرهەمهێنەرەکان و دەرمانخانەکانین بە باشترین ستاندارد.</p>
     
-    <a href="Nprojekt2.html" class="mailbox-btn">📩 Partner Mail Box (Submit Products)</a>
+    <a href="Nprojekt2.html" class="mailbox-btn">
+        <span>📩 سندوقی نامەی هاوبەشان (ناردنی بەرهەم)</span>
+    </a>
 </div>
 
 <section>
-    <h3>About Us</h3>
-    <p>MedBridge acts as a vital link in the medical supply chain. Whether you are a small manufacturer looking for reach or a pharmacy looking for unique stock, we are your primary partner.</p>
+    <div class="about-card">
+        <h3>دەربارەی ئێمە</h3>
+        <p>کۆگای دەرمانی ژامبەر پەیوەندییەکی ڕاستەوخۆ و بەهێزی هەیە لەگەڵ بریکارە سەرەکییەکانی کۆمپانیا ناودارەکانی دەرمان. ئێمە پابەندین بە دروستکردنی هاوبەشییەکی درێژخایەن، لەسەر بنەمای متمانە، ڕێزلێنان و هاوکاریی پیشەیی.</p>
+        <p>ژامبەر شوێنێکە بۆ ئەو بریکارانەی کە دەیانەوێت بە شێوەیەکی ڕاستەوخۆ و سیستەمی، بەرهەمەکانیان بگەننە بازاڕ بە دڵنیایی و ڕێکخراوی.</p>
+    </div>
 </section>
+
+<footer>
+    <div class="social-links">
+        <a href="#" class="social-btn fb">Facebook</a>
+        <a href="#" class="social-btn ig">Instagram</a>
+    </div>
+    <div class="copyright">
+        &copy; 2026 Zhambar Pharma. All Rights Reserved. <br>
+        Developed by Brwa | IT CIS
+    </div>
+</footer>
 
 </body>
 </html>

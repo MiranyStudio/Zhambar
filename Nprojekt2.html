@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brwa | Live Admin Portal</title>
     <style>
-        :root { --primary: #00ffa3; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        :root { --primary: #00ffa3; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --danger: #ff4b5c; }
         body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
         .card { background: var(--card); width: 100%; max-width: 500px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; box-sizing: border-box; }
@@ -17,15 +17,21 @@
         
         button { background: var(--primary); color: #000; font-weight: 700; border: none; cursor: pointer; }
         button:hover { opacity: 0.9; transform: translateY(-2px); }
-        button:disabled { background: #334155; color: #64748b; }
+        .btn-danger { background: var(--danger); color: white; margin-top: 10px; }
 
         /* Inbox List Styles */
-        .mail-item { background: #0f172a; padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border-left: 4px solid var(--primary); border-bottom: 1px solid #334155; animation: slideIn 0.4s ease; }
-        .mail-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; border: 1px solid var(--primary); cursor: pointer; }
+        .mail-item { background: #0f172a; padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border-left: 4px solid var(--primary); border-bottom: 1px solid #334155; animation: slideIn 0.4s ease; position: relative; }
+        .mail-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; border: 1px solid var(--primary); cursor: pointer; transition: 0.2s; }
+        .mail-img:hover { transform: scale(1.1); }
         .mail-info { flex: 1; font-size: 13px; }
         .mail-info b { color: var(--primary); font-size: 15px; display: block; margin-bottom: 2px; }
-        .mail-info span { color: #94a3b8; font-family: monospace; }
-        .mail-info p { margin: 8px 0 0 0; color: #f8fafc; line-height: 1.4; }
+        
+        .delete-btn { background: none; border: none; color: #64748b; font-size: 18px; cursor: pointer; width: auto; padding: 5px; margin: 0; }
+        .delete-btn:hover { color: var(--danger); }
+
+        /* Modal for Image Viewing */
+        #imgModal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        #imgModal img { max-width: 90%; max-height: 80%; border-radius: 10px; border: 2px solid var(--primary); }
         
         .hidden { display: none; }
         .loader { text-align: center; color: var(--primary); padding: 20px; font-weight: 600; font-style: italic; }
@@ -35,21 +41,22 @@
 </head>
 <body>
 
+<div id="imgModal" onclick="this.style.display='none'">
+    <img id="modalImg" src="">
+    <p style="position: absolute; bottom: 20px; color: white;">Click anywhere to close</p>
+</div>
+
 <div class="card">
     <h2>Submit Product</h2>
     <form id="pForm">
         <label>Email Address</label>
         <input type="email" id="email" placeholder="example@mail.com" required>
-        
         <label>Phone Number</label>
         <input type="tel" id="phone" placeholder="0750 XXX XXXX" required>
-        
         <label>Product Photo</label>
         <input type="file" id="photo" accept="image/*" required>
-        
         <label>Extra Notes</label>
         <textarea id="notes" rows="2" placeholder="Details about the item..."></textarea>
-        
         <button type="submit" id="sBtn">Send to Admin</button>
     </form>
 </div>
@@ -63,7 +70,10 @@
     </div>
 
     <div id="mailboxArea" class="hidden">
-        <button onclick="fetchMail()" style="background: #1e293b; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px; font-size: 14px;">Refresh Messages ↻</button>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="fetchMail()" style="background: #1e293b; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px; font-size: 14px; flex: 2;">Refresh ↻</button>
+            <button onclick="clearAll()" style="background: #1e293b; color: var(--danger); border: 1px solid var(--danger); margin-bottom: 15px; font-size: 14px; flex: 1;">Clear View</button>
+        </div>
         <div id="loading" class="loader hidden">Syncing with Cloud...</div>
         <div id="mailList"></div>
     </div>
@@ -74,13 +84,20 @@
 </div>
 
 <script>
-    // YOUR UPDATED SCRIPT URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzdB4JZNRvODCqsjotGcMTgASeejUE8BLr6dw-Cdb3ZqjZs-mh2bTCAHXlMo_QV0R8nrA/exec';
 
+    // 1. IMAGE MODAL VIEW
+    function openImg(src) {
+        const modal = document.getElementById('imgModal');
+        const modalImg = document.getElementById('modalImg');
+        modal.style.display = "flex";
+        modalImg.src = src;
+    }
+
+    // 2. SUBMIT DATA
     const form = document.getElementById('pForm');
     const btn = document.getElementById('sBtn');
 
-    // 1. SUBMIT DATA (User Side)
     form.onsubmit = function(e) {
         e.preventDefault();
         btn.innerText = "Syncing...";
@@ -99,22 +116,22 @@
 
             fetch(scriptURL, {
                 method: 'POST',
-                mode: 'no-cors', // Critical for sending to Google Apps Script
+                mode: 'no-cors',
                 body: JSON.stringify(payload)
             }).then(() => {
-                alert("✓ Success! Message delivered to Admin.");
+                alert("✓ Success! Message delivered.");
                 btn.innerText = "Send to Admin";
                 btn.disabled = false;
                 form.reset();
             }).catch(err => {
-                alert("Network error. Try again.");
+                alert("Network error.");
                 btn.disabled = false;
             });
         };
         reader.readAsDataURL(file);
     };
 
-    // 2. ADMIN LOGIN
+    // 3. ADMIN LOGIN
     function login() {
         if(document.getElementById('adminPass').value === "admin123") {
             document.getElementById('loginArea').classList.add('hidden');
@@ -125,7 +142,7 @@
         }
     }
 
-    // 3. FETCH MAIL (Admin Side - Direct View)
+    // 4. FETCH AND MANAGE MAIL
     function fetchMail() {
         const list = document.getElementById('mailList');
         const loader = document.getElementById('loading');
@@ -140,24 +157,35 @@
                     list.innerHTML = '<p style="text-align:center; color:#64748b;">Inbox is empty.</p>';
                     return;
                 }
-                // Reverse to show newest messages first
-                data.reverse().forEach(item => {
+                data.reverse().forEach((item, index) => {
                     list.innerHTML += `
-                        <div class="mail-item">
-                            <img src="${item.photo}" class="mail-img" onclick="window.open(this.src)">
+                        <div class="mail-item" id="msg-${index}">
+                            <img src="${item.photo}" class="mail-img" onclick="openImg(this.src)">
                             <div class="mail-info">
                                 <b>${item.email}</b>
-                                <span>${item.phone}</span>
+                                <span style="font-family: monospace; color: #94a3b8;">${item.phone}</span>
                                 <p>${item.notes || 'No notes provided.'}</p>
                             </div>
+                            <button class="delete-btn" onclick="removeUI('msg-${index}')">✕</button>
                         </div>
                     `;
                 });
             })
             .catch(err => {
-                loader.innerText = "Error: Check URL or Permissions.";
-                console.error(err);
+                loader.innerText = "Error syncing data.";
             });
+    }
+
+    function removeUI(id) {
+        if(confirm("Remove this message from view?")) {
+            document.getElementById(id).style.display = 'none';
+        }
+    }
+
+    function clearAll() {
+        if(confirm("Clear the entire local view?")) {
+            document.getElementById('mailList').innerHTML = '<p style="text-align:center; color:#64748b;">Inbox cleared.</p>';
+        }
     }
 </script>
 

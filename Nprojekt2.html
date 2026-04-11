@@ -3,133 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ژامبەر | پۆرتاڵی بەڕێوبەر</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <title>Zhambar | Premium Admin Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #10b981; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --danger: #ef4444; }
-        body { font-family: 'Noto Sans Arabic', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        .card { background: var(--card); width: 100%; max-width: 500px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 20px; box-sizing: border-box; }
-        
-        h2 { color: var(--primary); text-align: center; margin-top: 0; }
-        input, textarea, button { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #cbd5e1; box-sizing: border-box; font-family: inherit; }
-        
-        button { background: var(--primary); color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
-        button:hover { opacity: 0.9; }
-        
-        .mail-item { background: #f1f5f9; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; border-right: 5px solid var(--primary); }
-        .mail-img { width: 65px; height: 65px; border-radius: 10px; object-fit: cover; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
-        .mail-img:hover { transform: scale(1.05); }
-        
-        .mail-info { flex: 1; font-size: 14px; }
-        .mail-info b { color: var(--primary); display: block; }
-        
-        .delete-btn { background: none; color: #94a3b8; border: none; cursor: pointer; font-size: 18px; width: auto; margin: 0; padding: 5px; }
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --surface: #ffffff;
+            --background: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        }
 
-        /* Modal / Pop-up Window */
-        #imgModal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; cursor: zoom-out; }
-        #imgModal img { max-width: 90%; max-height: 85%; border-radius: 15px; border: 3px solid white; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans Arabic', sans-serif;
+            background: radial-gradient(at top right, #f1f5f9, #f8fafc);
+            color: var(--text-main);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .app-shell { width: 100%; max-width: 600px; }
+
+        /* Smooth Transition Engine */
+        .view { display: none; opacity: 0; transform: translateY(10px); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .view.active { display: block; opacity: 1; transform: translateY(0); }
+
+        .glass-card {
+            background: var(--surface);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: var(--radius-lg);
+            padding: 48px;
+            box-shadow: var(--shadow-premium);
+        }
+
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; text-align: center; letter-spacing: -0.5px; }
+        .subtitle { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 32px; }
+
+        /* High-End Form Controls */
+        .input-group { margin-bottom: 24px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
         
-        .hidden { display: none; }
-        .loader { text-align: center; padding: 10px; color: var(--primary); font-weight: bold; }
+        input, textarea {
+            width: 100%; padding: 14px 16px; border-radius: var(--radius-md);
+            border: 1px solid #e2e8f0; background: #fdfdfd;
+            font-size: 15px; transition: 0.2s; box-sizing: border-box;
+        }
+
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
+
+        .btn-primary {
+            width: 100%; padding: 16px; border-radius: var(--radius-md);
+            background: var(--text-main); color: white; border: none;
+            font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); background: #000; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+
+        /* Usage Meter */
+        .usage-meter {
+            background: #f1f5f9; height: 6px; border-radius: 10px; margin: 15px 0; overflow: hidden;
+        }
+        .usage-bar { background: var(--primary); height: 100%; width: 0%; transition: 1s ease; }
+
+        /* Dashboard UI */
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .logout-link { color: var(--danger); text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; }
+
+        .mail-card {
+            background: white; border: 1px solid #f1f5f9; padding: 20px;
+            border-radius: var(--radius-md); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 20px; transition: 0.3s;
+        }
+        .mail-card:hover { border-color: var(--primary); transform: translateX(-5px); }
+
+        .mail-img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; cursor: zoom-in; }
+        .mail-content { flex: 1; }
+        .mail-content b { font-size: 16px; display: block; }
+        .mail-content span { color: var(--primary); font-family: monospace; font-size: 13px; }
+
+        /* Full Screen Image Modal */
+        #imgModal {
+            display: none; position: fixed; inset: 0; z-index: 999;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            justify-content: center; align-items: center; cursor: zoom-out;
+        }
+        #imgModal img { max-height: 85%; max-width: 90%; border-radius: 20px; box-shadow: 0 40px 100px rgba(0,0,0,0.2); }
+
     </style>
 </head>
 <body>
 
-<div id="imgModal" onclick="this.style.display='none'">
-    <img id="modalImg" src="">
-</div>
+<div id="imgModal" onclick="this.style.display='none'"><img id="modalImg" src=""></div>
 
-<div class="card">
-    <h2>ناردنی بەرهەم</h2>
-    <form id="pForm">
-        <input type="email" id="email" placeholder="ئیمەیڵ (Email)" required dir="ltr">
-        <input type="tel" id="phone" placeholder="ژمارەی مۆبایل" required dir="ltr">
-        <input type="file" id="photo" accept="image/*" required>
-        <textarea id="notes" rows="2" placeholder="تێبینی زیادە..."></textarea>
-        <button type="submit" id="sBtn">ناردن بۆ بەڕێوبەر</button>
-    </form>
-</div>
-
-<div class="card">
-    <h3 style="text-align: center; color: #64748b;">سندوقی نامەکان</h3>
+<div class="app-shell">
     
-    <div id="loginArea">
-        <input type="password" id="adminPass" placeholder="وشەی نهێنی">
-        <button onclick="login()" style="background: #334155;">چوونە ناوەوە</button>
+    <div id="userView" class="view glass-card active">
+        <h1>ناردنی بەرهەم</h1>
+        <p class="subtitle">تکایە زانیارییەکان بە وردی پڕ بکەرەوە</p>
+        
+        <form id="pForm">
+            <div class="input-group">
+                <label>ئیمەیڵی فەرمی</label>
+                <input type="email" id="email" placeholder="example@mail.com" required dir="ltr">
+            </div>
+            <div class="input-group">
+                <label>مۆبایل</label>
+                <input type="tel" id="phone" placeholder="0750 XXX XXXX" required dir="ltr">
+            </div>
+            <div class="input-group">
+                <label>وێنەی بەرهەم</label>
+                <input type="file" id="photo" accept="image/*" required>
+            </div>
+            <div class="input-group">
+                <label>تێبینی زیادە</label>
+                <textarea id="notes" rows="3" placeholder="..."></textarea>
+            </div>
+            
+            <button type="submit" id="sBtn" class="btn-primary">ناردن بۆ داتابەیس</button>
+            
+            <div class="usage-meter"><div id="usageBar" class="usage-bar"></div></div>
+            <p id="limitText" style="font-size: 11px; text-align: center; color: var(--text-muted);">بەکارهێنراو: 0 / 30 (لە 24 کاتژمێردا)</p>
+        </form>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <button onclick="switchView('loginView')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:13px;">Management Access</button>
+        </div>
     </div>
 
-    <div id="mailboxArea" class="hidden">
-        <button onclick="fetchMail()" style="background: white; color: var(--primary); border: 1px solid var(--primary); margin-bottom: 15px;">تازەکردنەوە ↻</button>
-        <div id="loading" class="loader hidden">خەریکی وەرگرتنی زانیارییەکانە...</div>
+    <div id="loginView" class="view glass-card">
+        <h1>چوونە ناوەوە</h1>
+        <p class="subtitle">بۆ چوونە ناو سندوقی نامەکان وشەی نهێنی بنووسە</p>
+        <input type="password" id="adminPass" placeholder="Password" style="margin-bottom: 20px;">
+        <button onclick="handleLogin()" class="btn-primary">Access Dashboard</button>
+        <p onclick="switchView('userView')" style="text-align:center; margin-top:20px; cursor:pointer; font-size:13px;">گەڕانەوە</p>
+    </div>
+
+    <div id="adminView" class="view">
+        <div class="nav-header">
+            <h2 style="margin:0;">Inbox Dashboard</h2>
+            <a class="logout-link" onclick="handleLogout()">Logout</a>
+        </div>
+        <button onclick="fetchMail()" style="background:#fff; border:1px solid #e2e8f0; width:100%; padding:12px; border-radius:12px; margin-bottom:24px; cursor:pointer;">Refresh Inbox ↻</button>
         <div id="mailList"></div>
     </div>
+
 </div>
 
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxEgG9ZhH9sfz-f0qByOKt-IuLon_QYjM3BrkasjaTGpzWAWOn6awx3vu9KZz2r9Tsg/exec';
 
-    function login() {
-        if(document.getElementById('adminPass').value === "admin123") {
-            document.getElementById('loginArea').classList.add('hidden');
-            document.getElementById('mailboxArea').classList.remove('hidden');
-            fetchMail();
-        } else { alert("وشەی نهێنی هەڵەیە!"); }
+    // UI Controller
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        setTimeout(() => {
+            document.getElementById(id).classList.add('active');
+            if(id === 'userView') updateUsageUI();
+        }, 100);
     }
 
-    // Function to open the Pop-up image
-    function openPreview(src) {
+    // Auth
+    function handleLogin() {
+        if(document.getElementById('adminPass').value === "admin123") {
+            switchView('adminView');
+            fetchMail();
+        } else { alert("کۆدەکە هەڵەیە"); }
+    }
+
+    function handleLogout() {
+        document.getElementById('adminPass').value = '';
+        switchView('userView');
+    }
+
+    // Rate Limit Logic
+    function getHistory() {
+        const now = Date.now();
+        let history = JSON.parse(localStorage.getItem('zhambar_uploads') || "[]");
+        return history.filter(t => now - t < 24 * 60 * 60 * 1000);
+    }
+
+    function updateUsageUI() {
+        const count = getHistory().length;
+        const percent = (count / 30) * 100;
+        document.getElementById('usageBar').style.width = percent + "%";
+        document.getElementById('limitText').innerText = `بەکارهێنراو: ${count} / 30 (لە 24 کاتژمێردا)`;
+    }
+
+    // Database Actions
+    function fetchMail() {
+        const list = document.getElementById('mailList');
+        list.innerHTML = '<p style="text-align:center;">خەریکی هێنانی زانیارییەکانە...</p>';
+        fetch(scriptURL).then(res => res.json()).then(data => {
+            list.innerHTML = '';
+            data.reverse().forEach(item => {
+                list.innerHTML += `
+                    <div class="mail-card" id="row-${item.rowId}">
+                        <img src="${item.photo}" class="mail-img" onclick="openImg('${item.photo}')">
+                        <div class="mail-content">
+                            <b>${item.email}</b>
+                            <span>${item.phone}</span>
+                            <p style="margin:5px 0 0 0; font-size:13px; color:#64748b;">${item.notes || ''}</p>
+                        </div>
+                        <div style="color:#cbd5e1; cursor:pointer;" onclick="deleteItem(${item.rowId})">✕</div>
+                    </div>`;
+            });
+        });
+    }
+
+    function deleteItem(id) {
+        if(!confirm("سڕینەوە؟")) return;
+        document.getElementById(`row-${id}`).style.opacity = "0.2";
+        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ command: "DELETE", rowId: id }) })
+        .then(() => document.getElementById(`row-${id}`).remove());
+    }
+
+    function openImg(src) {
         document.getElementById('modalImg').src = src;
         document.getElementById('imgModal').style.display = 'flex';
     }
 
-    function fetchMail() {
-        const list = document.getElementById('mailList');
-        const loader = document.getElementById('loading');
-        list.innerHTML = '';
-        loader.classList.remove('hidden');
-
-        fetch(scriptURL)
-            .then(res => res.json())
-            .then(data => {
-                loader.classList.add('hidden');
-                if(data.length === 0) {
-                    list.innerHTML = '<p style="text-align:center;">هیچ نامەیەک نییە.</p>';
-                    return;
-                }
-                data.reverse().forEach(item => {
-                    list.innerHTML += `
-                        <div class="mail-item" id="row-${item.rowId}">
-                            <img src="${item.photo}" class="mail-img" onclick="openPreview(this.src)">
-                            <div class="mail-info">
-                                <b>${item.email}</b>
-                                <span dir="ltr">${item.phone}</span>
-                                <p style="margin: 5px 0 0 0; font-size:13px;">${item.notes || ''}</p>
-                            </div>
-                            <button class="delete-btn" onclick="serverDelete(${item.rowId})">✕</button>
-                        </div>`;
-                });
-            });
-    }
-
-    function serverDelete(rowId) {
-        if(!confirm("ئایا دڵنیای لە سڕینەوە؟")) return;
-        
-        const element = document.getElementById(`row-${rowId}`);
-        element.style.opacity = "0.3";
-        element.style.pointerEvents = "none";
-
-        fetch(scriptURL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ command: "DELETE", rowId: rowId })
-        }).then(() => {
-            element.remove();
-        });
-    }
-
+    // Submit Action
     document.getElementById('pForm').onsubmit = function(e) {
         e.preventDefault();
+        if(getHistory().length >= 30) {
+            alert("ببورە، ناتوانی زیاتر لە ٣٠ نامە بنێریت لە ٢٤ کاتژمێردا.");
+            return;
+        }
+
         const btn = document.getElementById('sBtn');
         btn.innerText = "خەریکی ناردنە...";
         btn.disabled = true;
@@ -146,12 +253,18 @@
                     photo: reader.result
                 })
             }).then(() => {
-                alert("✓ نێردرا!");
+                let history = getHistory();
+                history.push(Date.now());
+                localStorage.setItem('zhambar_uploads', JSON.stringify(history));
+                alert("✓ بە سەرکەوتوویی نێردرا");
                 location.reload();
             });
         };
         reader.readAsDataURL(document.getElementById('photo').files[0]);
     };
+
+    // Initialize
+    updateUsageUI();
 </script>
 </body>
 </html>
